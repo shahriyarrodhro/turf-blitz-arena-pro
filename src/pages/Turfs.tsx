@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Star, MapPin, Clock, Users, Calendar, ArrowLeft, Play, SlidersHorizontal } from 'lucide-react';
+import { Search, Filter, Star, MapPin, Clock, Users, Calendar, ArrowLeft, Play, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,7 +42,8 @@ const Turfs = () => {
       image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
       features: ["Air Conditioning", "Canteen", "First Aid"],
       availableSlots: 12,
-      nextAvailable: "7:00 PM"
+      nextAvailable: "7:00 PM",
+      distance: "2.1 km"
     },
     {
       id: 3,
@@ -54,7 +56,8 @@ const Turfs = () => {
       image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
       features: ["Professional Grass", "Stadium Seating", "Scoreboard"],
       availableSlots: 4,
-      nextAvailable: "8:00 PM"
+      nextAvailable: "8:00 PM",
+      distance: "3.5 km"
     },
     {
       id: 4,
@@ -67,7 +70,8 @@ const Turfs = () => {
       image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
       features: ["Synthetic Turf", "Lighting", "Security"],
       availableSlots: 6,
-      nextAvailable: "5:30 PM"
+      nextAvailable: "5:30 PM",
+      distance: "5.2 km"
     },
     {
       id: 5,
@@ -80,7 +84,8 @@ const Turfs = () => {
       image: "https://images.unsplash.com/photo-1500673922987-e212871fec22",
       features: ["Indoor", "Air Conditioning", "Refreshments"],
       availableSlots: 10,
-      nextAvailable: "6:30 PM"
+      nextAvailable: "6:30 PM",
+      distance: "4.8 km"
     },
     {
       id: 6,
@@ -93,7 +98,8 @@ const Turfs = () => {
       image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
       features: ["Natural Grass", "Coaching Available", "Equipment Rental"],
       availableSlots: 7,
-      nextAvailable: "7:30 PM"
+      nextAvailable: "7:30 PM",
+      distance: "6.1 km"
     }
   ];
 
@@ -107,118 +113,124 @@ const Turfs = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Enhanced Header */}
-      <div className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/90 border-b border-lime-500/20">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+    <div className="min-h-screen bg-stone-50">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
                 onClick={() => navigate('/')}
-                className="text-slate-400 hover:text-lime-400 p-2"
+                className="text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-lime-400 to-emerald-500 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-stone-900">
                 Browse Turfs
               </h1>
             </div>
             <Button 
               onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600 px-4 py-2 text-sm"
+              className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl px-6"
             >
-              <Play className="w-4 h-4 mr-1" />
+              <Play className="w-4 h-4 mr-2" />
               Book Now
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
-        {/* Enhanced Search & Filters */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search & Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
           {/* Main Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <div className="relative mb-6">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-stone-400" />
             <Input
               placeholder="Search turfs, location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-3 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-400 rounded-2xl text-lg"
+              className="pl-12 pr-4 py-4 bg-white border-stone-200 text-stone-900 placeholder:text-stone-500 rounded-2xl text-lg shadow-sm"
             />
           </div>
 
-          {/* Filter Chips */}
-          <div className="flex items-center space-x-3 mb-4 overflow-x-auto pb-2">
-            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-              <SelectTrigger className="bg-slate-800/50 border-slate-600 rounded-full min-w-fit">
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700 rounded-xl">
-                <SelectItem value="all">All Areas</SelectItem>
-                <SelectItem value="Dhanmondi">Dhanmondi</SelectItem>
-                <SelectItem value="Gulshan">Gulshan</SelectItem>
-                <SelectItem value="Banani">Banani</SelectItem>
-                <SelectItem value="Uttara">Uttara</SelectItem>
-                <SelectItem value="Mirpur">Mirpur</SelectItem>
-                <SelectItem value="Wari">Wari</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Filter Pills */}
+          <div className="flex items-center space-x-3 mb-6 overflow-x-auto pb-2">
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
+              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
+                  <SelectValue placeholder="Location" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
+                  <SelectItem value="all">All Areas</SelectItem>
+                  <SelectItem value="Dhanmondi">Dhanmondi</SelectItem>
+                  <SelectItem value="Gulshan">Gulshan</SelectItem>
+                  <SelectItem value="Banani">Banani</SelectItem>
+                  <SelectItem value="Uttara">Uttara</SelectItem>
+                  <SelectItem value="Mirpur">Mirpur</SelectItem>
+                  <SelectItem value="Wari">Wari</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="bg-slate-800/50 border-slate-600 rounded-full min-w-fit">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700 rounded-xl">
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="5v5">5v5</SelectItem>
-                <SelectItem value="7v7">7v7</SelectItem>
-                <SelectItem value="11v11">11v11</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="5v5">5v5</SelectItem>
+                  <SelectItem value="7v7">7v7</SelectItem>
+                  <SelectItem value="11v11">11v11</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="bg-slate-800/50 border-slate-600 rounded-full min-w-fit">
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700 rounded-xl">
-                <SelectItem value="popular">Most Popular</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Highest Rated</SelectItem>
-                <SelectItem value="distance">Nearest First</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
+                  <SelectItem value="popular">Most Popular</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem value="rating">Highest Rated</SelectItem>
+                  <SelectItem value="distance">Nearest First</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <Button
               variant="outline"
-              className="border-lime-500/50 text-lime-400 hover:bg-lime-500/10 rounded-full px-4"
+              className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl px-4 py-3 font-medium"
             >
               <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              More Filters
             </Button>
           </div>
 
           {/* Results Count */}
           <div className="flex items-center justify-between">
-            <p className="text-slate-400 text-sm">
-              {filteredTurfs.length} turfs found
+            <p className="text-stone-600">
+              <span className="font-semibold text-stone-900">{filteredTurfs.length}</span> turfs found
             </p>
             <div className="flex items-center space-x-2">
-              <span className="text-slate-400 text-sm">View:</span>
-              <Button variant="ghost" size="sm" className="text-lime-400">Grid</Button>
-              <Button variant="ghost" size="sm" className="text-slate-400">List</Button>
+              <span className="text-stone-600 text-sm">View:</span>
+              <Button variant="ghost" size="sm" className="text-lime-600 bg-lime-50 rounded-xl">Grid</Button>
+              <Button variant="ghost" size="sm" className="text-stone-600 rounded-xl">List</Button>
             </div>
           </div>
         </motion.div>
 
-        {/* Enhanced Turf Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Turf Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredTurfs.map((turf, index) => (
             <motion.div
               key={turf.id}
@@ -229,93 +241,84 @@ const Turfs = () => {
               className="group cursor-pointer"
               onClick={() => navigate(`/turf/${turf.id}`)}
             >
-              <Card className="backdrop-blur-sm bg-slate-800/50 border-slate-700/50 hover:border-lime-500/50 transition-all duration-300 overflow-hidden h-full shadow-lg hover:shadow-2xl">
+              <Card className="bg-white border border-stone-200 hover:shadow-2xl transition-all duration-300 overflow-hidden h-full rounded-3xl">
                 <div className="relative">
                   <img
                     src={turf.image}
                     alt={turf.name}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   
                   {/* Top Badges */}
                   <div className="absolute top-4 left-4 space-y-2">
-                    <Badge className="bg-lime-500/20 text-lime-400 border-lime-500/30 backdrop-blur-sm">
+                    <Badge className="bg-lime-100 text-lime-700 border-lime-200 rounded-full px-3 py-1 font-medium">
                       {turf.type}
                     </Badge>
-                    {turf.distance && (
-                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 backdrop-blur-sm">
-                        {turf.distance}
-                      </Badge>
-                    )}
+                    <Badge className="bg-blue-100 text-blue-700 border-blue-200 rounded-full px-3 py-1 font-medium">
+                      {turf.distance}
+                    </Badge>
                   </div>
                   
                   {/* Price Badge */}
                   <div className="absolute top-4 right-4">
-                    <Badge className="bg-slate-900/90 text-white backdrop-blur-sm">
+                    <Badge className="bg-white/95 text-stone-900 rounded-full px-3 py-1 font-bold shadow-sm">
                       ৳{turf.price}/hr
                     </Badge>
                   </div>
 
                   {/* Bottom Info Overlay */}
                   <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center justify-between text-white">
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-bold">{turf.rating}</span>
-                        <span className="text-slate-300 text-sm">({turf.reviews})</span>
-                      </div>
-                      <div className="flex items-center text-emerald-400 text-sm">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        <span>{turf.availableSlots} slots</span>
+                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                          <span className="font-bold text-stone-900">{turf.rating}</span>
+                          <span className="text-stone-600 text-sm">({turf.reviews})</span>
+                        </div>
+                        <div className="flex items-center text-green-600 text-sm font-medium">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          <span>{turf.availableSlots} slots</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-white group-hover:text-lime-400 transition-colors text-lg line-clamp-1">
+                  <CardTitle className="text-stone-900 group-hover:text-lime-600 transition-colors text-xl">
                     {turf.name}
                   </CardTitle>
-                  <CardDescription className="flex items-center text-slate-400">
-                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                    <span className="line-clamp-1">{turf.location}</span>
+                  <CardDescription className="flex items-center text-stone-600">
+                    <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span>{turf.location}</span>
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent className="pt-0">
                   <div className="space-y-4">
                     {/* Features */}
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                       {turf.features.slice(0, 3).map((feature) => (
                         <Badge 
                           key={feature}
                           variant="secondary"
-                          className="text-xs bg-slate-700/50 text-slate-300 border-slate-600/50"
+                          className="text-xs bg-stone-100 text-stone-700 border-stone-200 rounded-full px-3 py-1"
                         >
                           {feature}
                         </Badge>
                       ))}
-                      {turf.features.length > 3 && (
-                        <Badge 
-                          variant="secondary"
-                          className="text-xs bg-slate-700/50 text-slate-300 border-slate-600/50"
-                        >
-                          +{turf.features.length - 3}
-                        </Badge>
-                      )}
                     </div>
 
-                    {/* Next Available */}
+                    {/* Next Available & Book Button */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center text-slate-400 text-sm">
+                      <div className="flex items-center text-stone-600 text-sm">
                         <Clock className="w-4 h-4 mr-1" />
                         <span>Next: {turf.nextAvailable}</span>
                       </div>
                       
                       <Button
                         size="sm"
-                        className="bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600 font-semibold"
+                        className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-xl px-4"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/turf/${turf.id}`);
@@ -338,11 +341,11 @@ const Turfs = () => {
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="w-24 h-24 mx-auto mb-6 bg-slate-800/50 rounded-full flex items-center justify-center">
-              <Search className="w-12 h-12 text-slate-400" />
+            <div className="w-24 h-24 mx-auto mb-6 bg-stone-100 rounded-full flex items-center justify-center">
+              <Search className="w-12 h-12 text-stone-400" />
             </div>
-            <h3 className="text-2xl font-semibold text-white mb-3">No turfs found</h3>
-            <p className="text-slate-400 mb-8 max-w-md mx-auto">
+            <h3 className="text-2xl font-semibold text-stone-900 mb-3">No turfs found</h3>
+            <p className="text-stone-600 mb-8 max-w-md mx-auto">
               Try adjusting your search criteria or browse all available turfs
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -353,13 +356,13 @@ const Turfs = () => {
                   setSelectedType('all');
                 }}
                 variant="outline"
-                className="border-lime-500/50 text-lime-400 hover:bg-lime-500/10"
+                className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl"
               >
                 Clear Filters
               </Button>
               <Button
                 onClick={() => navigate('/')}
-                className="bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600"
+                className="bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-2xl"
               >
                 Back to Home
               </Button>
@@ -372,7 +375,7 @@ const Turfs = () => {
           <div className="text-center mt-12">
             <Button
               variant="outline"
-              className="border-lime-500/50 text-lime-400 hover:bg-lime-500/10 px-8"
+              className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl px-8 py-3 font-semibold"
             >
               Load More Turfs
             </Button>

@@ -1,309 +1,285 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { User, Mail, Phone, MapPin, Calendar, Building, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, MapPin, Phone, Mail, Zap, Users, Building, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [activeTab, setActiveTab] = useState('login');
-  const [userType, setUserType] = useState('player');
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [authMode, setAuthMode] = useState('login');
+  const [userType, setUserType] = useState('player');
 
-  const demoCredentials = {
-    admin: { email: 'admin@example.com', password: 'admin123' },
-    turf_owner: { email: 'turf@example.com', password: 'turf123' },
-    player: { email: 'player@example.com', password: 'player123' }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Login Successful!",
-        description: "Welcome back to TurfMaster",
-      });
-      
-      // Redirect based on user type
-      if (userType === 'admin') {
+  const handleLogin = (role: string) => {
+    // Simulate login and redirect based on role
+    switch (role) {
+      case 'admin':
         navigate('/admin');
-      } else if (userType === 'turf_owner') {
+        break;
+      case 'turf-owner':
         navigate('/turf-owner');
-      } else {
+        break;
+      default:
         navigate('/player');
-      }
-    }, 1500);
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Registration Successful!",
-        description: "Welcome to TurfMaster community",
-      });
-      navigate('/player');
-    }, 1500);
-  };
-
-  const handleDemoLogin = (type: keyof typeof demoCredentials) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Demo Login Successful!",
-        description: `Logged in as ${type.replace('_', ' ')}`,
-      });
-      
-      if (type === 'admin') {
-        navigate('/admin');
-      } else if (type === 'turf_owner') {
-        navigate('/turf-owner');
-      } else {
-        navigate('/player');
-      }
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-lime-100 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-100 rounded-full opacity-20 blur-3xl"></div>
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6 text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
         >
-          {/* Header */}
-          <div className="text-center mb-8">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="absolute top-6 left-6 text-slate-400 hover:text-lime-400"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-            
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-lime-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                <Zap className="w-7 h-7 text-slate-900" />
-              </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-lime-400 to-emerald-500 bg-clip-text text-transparent">
-                TurfMaster
-              </span>
-            </div>
-            <p className="text-slate-400">Join the future of sports booking</p>
-          </div>
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back to Home
+        </Button>
 
-          {/* Demo Credentials */}
-          <Card className="backdrop-blur-sm bg-slate-800/50 border-slate-700/50 mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lime-400 text-sm">Demo Credentials</CardTitle>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="bg-white border border-stone-200 rounded-3xl shadow-lg">
+            <CardHeader className="text-center pb-6">
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                className="w-16 h-16 bg-lime-400 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              >
+                <User className="w-8 h-8 text-stone-900" />
+              </motion.div>
+              <CardTitle className="text-2xl font-bold text-stone-900">
+                {authMode === 'login' ? 'Welcome Back' : 'Join TurfMaster'}
+              </CardTitle>
+              <CardDescription className="text-stone-600">
+                {authMode === 'login' 
+                  ? 'Sign in to book turfs and join tournaments' 
+                  : 'Create an account to get started'
+                }
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDemoLogin('admin')}
-                  className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-                  disabled={isLoading}
-                >
-                  <Building className="w-3 h-3 mr-1" />
-                  Admin
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDemoLogin('turf_owner')}
-                  className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
-                  disabled={isLoading}
-                >
-                  <MapPin className="w-3 h-3 mr-1" />
-                  Turf Owner
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDemoLogin('player')}
-                  className="border-lime-500/50 text-lime-400 hover:bg-lime-500/10"
-                  disabled={isLoading}
-                >
-                  <Play className="w-3 h-3 mr-1" />
-                  Player
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Auth Tabs */}
-          <Card className="backdrop-blur-sm bg-slate-800/50 border-slate-700/50">
-            <CardContent className="p-6">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
-                  <TabsTrigger value="login" className="data-[state=active]:bg-lime-500/20 data-[state=active]:text-lime-400">
-                    Login
+            <CardContent>
+              <Tabs value={authMode} onValueChange={setAuthMode} className="mb-6">
+                <TabsList className="grid w-full grid-cols-2 bg-stone-100 rounded-2xl p-1">
+                  <TabsTrigger 
+                    value="login" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-semibold"
+                  >
+                    Sign In
                   </TabsTrigger>
-                  <TabsTrigger value="register" className="data-[state=active]:bg-lime-500/20 data-[state=active]:text-lime-400">
-                    Register
+                  <TabsTrigger 
+                    value="register" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm font-semibold"
+                  >
+                    Sign Up
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="login" className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="userType" className="text-slate-300">Login as</Label>
-                    <Select value={userType} onValueChange={setUserType}>
-                      <SelectTrigger className="bg-slate-700/50 border-slate-600">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700">
-                        <SelectItem value="player">
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-2" />
-                            Player
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="turf_owner">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            Turf Owner
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="admin">
-                          <div className="flex items-center">
-                            <Building className="w-4 h-4 mr-2" />
-                            Admin
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                <TabsContent value="login" className="space-y-6 mt-6">
+                  {/* Demo Login Buttons */}
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-stone-700 mb-3">Demo Accounts:</h3>
+                    
+                    <Button
+                      onClick={() => handleLogin('player')}
+                      variant="outline"
+                      className="w-full justify-start border-stone-300 hover:bg-stone-50 rounded-2xl py-3"
+                    >
+                      <User className="w-4 h-4 mr-3" />
+                      <div className="text-left">
+                        <div className="font-medium">Player Demo</div>
+                        <div className="text-xs text-stone-600">player@example.com</div>
+                      </div>
+                    </Button>
+
+                    <Button
+                      onClick={() => handleLogin('turf-owner')}
+                      variant="outline"
+                      className="w-full justify-start border-stone-300 hover:bg-stone-50 rounded-2xl py-3"
+                    >
+                      <Building className="w-4 h-4 mr-3" />
+                      <div className="text-left">
+                        <div className="font-medium">Turf Owner Demo</div>
+                        <div className="text-xs text-stone-600">turf@example.com</div>
+                      </div>
+                    </Button>
+
+                    <Button
+                      onClick={() => handleLogin('admin')}
+                      variant="outline"
+                      className="w-full justify-start border-stone-300 hover:bg-stone-50 rounded-2xl py-3"
+                    >
+                      <User className="w-4 h-4 mr-3" />
+                      <div className="text-left">
+                        <div className="font-medium">Admin Demo</div>
+                        <div className="text-xs text-stone-600">admin@example.com</div>
+                      </div>
+                    </Button>
                   </div>
 
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-slate-300">Email</Label>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-stone-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-2 text-stone-500">Or continue with</span>
+                    </div>
+                  </div>
+
+                  {/* Regular Login Form */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email" className="text-stone-700">Email</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="your@email.com"
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        placeholder="Enter your email"
+                        className="mt-1 border-stone-300 rounded-2xl py-3"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-slate-300">Password</Label>
+                    <div>
+                      <Label htmlFor="password" className="text-stone-700">Password</Label>
                       <Input
                         id="password"
                         type="password"
-                        placeholder="••••••••"
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        placeholder="Enter your password"
+                        className="mt-1 border-stone-300 rounded-2xl py-3"
                       />
                     </div>
-                    <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600"
-                      disabled={isLoading}
+                    <Button 
+                      onClick={() => handleLogin('player')}
+                      className="w-full bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl py-3"
                     >
-                      {isLoading ? 'Logging in...' : 'Login'}
+                      Sign In
                     </Button>
-                  </form>
+                  </div>
                 </TabsContent>
 
-                <TabsContent value="register" className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="registerType" className="text-slate-300">Register as</Label>
+                <TabsContent value="register" className="space-y-6 mt-6">
+                  {/* User Type Selection */}
+                  <div>
+                    <Label className="text-stone-700 mb-3 block">I want to join as:</Label>
                     <Select value={userType} onValueChange={setUserType}>
-                      <SelectTrigger className="bg-slate-700/50 border-slate-600">
+                      <SelectTrigger className="border-stone-300 rounded-2xl py-3">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700">
-                        <SelectItem value="player">
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-2" />
-                            Player
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="turf_owner">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            Turf Owner
-                          </div>
-                        </SelectItem>
+                      <SelectContent className="bg-white border-stone-200 rounded-2xl">
+                        <SelectItem value="player">Player</SelectItem>
+                        <SelectItem value="turf-owner">Turf Owner</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <form onSubmit={handleRegister} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="fullName" className="text-slate-300">
-                        {userType === 'turf_owner' ? 'Turf Name' : 'Full Name'}
-                      </Label>
-                      <Input
-                        id="fullName"
-                        placeholder={userType === 'turf_owner' ? 'Your Turf Name' : 'Your Full Name'}
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
-                      />
+                  {/* Registration Form */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="firstName" className="text-stone-700">First Name</Label>
+                        <Input
+                          id="firstName"
+                          placeholder="John"
+                          className="mt-1 border-stone-300 rounded-2xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-stone-700">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          placeholder="Doe"
+                          className="mt-1 border-stone-300 rounded-2xl"
+                        />
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-slate-300">Email</Label>
+                    <div>
+                      <Label htmlFor="email" className="text-stone-700">Email</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="your@email.com"
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        placeholder="john@example.com"
+                        className="mt-1 border-stone-300 rounded-2xl"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-slate-300">Phone Number</Label>
+                    <div>
+                      <Label htmlFor="phone" className="text-stone-700">Phone Number</Label>
                       <Input
                         id="phone"
                         type="tel"
                         placeholder="+880 1xxx-xxxxxx"
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        className="mt-1 border-stone-300 rounded-2xl"
                       />
                     </div>
 
-                    {userType === 'turf_owner' && (
+                    {userType === 'player' && (
                       <>
-                        <div className="space-y-2">
-                          <Label htmlFor="location" className="text-slate-300">Location</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label htmlFor="age" className="text-stone-700">Age</Label>
+                            <Input
+                              id="age"
+                              type="number"
+                              placeholder="25"
+                              className="mt-1 border-stone-300 rounded-2xl"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="city" className="text-stone-700">City</Label>
+                            <Select>
+                              <SelectTrigger className="border-stone-300 rounded-2xl">
+                                <SelectValue placeholder="Select city" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border-stone-200 rounded-2xl">
+                                <SelectItem value="dhaka">Dhaka</SelectItem>
+                                <SelectItem value="chittagong">Chittagong</SelectItem>
+                                <SelectItem value="sylhet">Sylhet</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {userType === 'turf-owner' && (
+                      <>
+                        <div>
+                          <Label htmlFor="turfName" className="text-stone-700">Turf Name</Label>
                           <Input
-                            id="location"
-                            placeholder="City, Area"
-                            required
-                            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                            id="turfName"
+                            placeholder="Champions Arena"
+                            className="mt-1 border-stone-300 rounded-2xl"
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="turfType" className="text-slate-300">Turf Type</Label>
+                        <div>
+                          <Label htmlFor="location" className="text-stone-700">Location</Label>
+                          <Input
+                            id="location"
+                            placeholder="Dhanmondi, Dhaka"
+                            className="mt-1 border-stone-300 rounded-2xl"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="turfType" className="text-stone-700">Turf Type</Label>
                           <Select>
-                            <SelectTrigger className="bg-slate-700/50 border-slate-600">
-                              <SelectValue placeholder="Select turf type" />
+                            <SelectTrigger className="border-stone-300 rounded-2xl">
+                              <SelectValue placeholder="Select type" />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700">
+                            <SelectContent className="bg-white border-stone-200 rounded-2xl">
                               <SelectItem value="5v5">5v5</SelectItem>
                               <SelectItem value="7v7">7v7</SelectItem>
                               <SelectItem value="11v11">11v11</SelectItem>
@@ -313,51 +289,36 @@ const Auth = () => {
                       </>
                     )}
 
-                    {userType === 'player' && (
-                      <>
-                        <div className="space-y-2">
-                          <Label htmlFor="age" className="text-slate-300">Age</Label>
-                          <Input
-                            id="age"
-                            type="number"
-                            placeholder="25"
-                            required
-                            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="city" className="text-slate-300">City</Label>
-                          <Input
-                            id="city"
-                            placeholder="Dhaka"
-                            required
-                            className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    <div className="space-y-2">
-                      <Label htmlFor="password" className="text-slate-300">Password</Label>
+                    <div>
+                      <Label htmlFor="password" className="text-stone-700">Password</Label>
                       <Input
                         id="password"
                         type="password"
-                        placeholder="••••••••"
-                        required
-                        className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
+                        placeholder="Create a strong password"
+                        className="mt-1 border-stone-300 rounded-2xl"
                       />
                     </div>
 
-                    <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600"
-                      disabled={isLoading}
+                    <Button 
+                      onClick={() => handleLogin(userType === 'turf-owner' ? 'turf-owner' : 'player')}
+                      className="w-full bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl py-3"
                     >
-                      {isLoading ? 'Creating Account...' : 'Create Account'}
+                      Create Account
                     </Button>
-                  </form>
+                  </div>
                 </TabsContent>
               </Tabs>
+
+              <div className="text-center text-sm text-stone-600">
+                By continuing, you agree to our{' '}
+                <a href="#" className="text-lime-600 hover:underline font-medium">
+                  Terms of Service
+                </a>{' '}
+                and{' '}
+                <a href="#" className="text-lime-600 hover:underline font-medium">
+                  Privacy Policy
+                </a>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

@@ -68,25 +68,25 @@ const TurfBooking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <div className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/90 border-b border-lime-500/20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-4">
             <Button
               variant="ghost"
               onClick={() => navigate('/turfs')}
-              className="text-slate-400 hover:text-lime-400"
+              className="text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-5 h-5 mr-2" />
               Back
             </Button>
-            <h1 className="text-lg font-bold bg-gradient-to-r from-lime-400 to-emerald-500 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-stone-900">
               Book Turf
             </h1>
             <Button
               variant="ghost"
-              className="text-slate-400 hover:text-red-400"
+              className="text-stone-600 hover:text-red-500 p-2 rounded-2xl"
             >
               <Heart className="w-5 h-5" />
             </Button>
@@ -94,7 +94,7 @@ const TurfBooking = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Turf Details */}
           <div className="lg:col-span-2 space-y-6">
@@ -109,9 +109,9 @@ const TurfBooking = () => {
                   <img
                     src={turf.images[0]}
                     alt={turf.name}
-                    className="w-full h-64 md:h-80 object-cover rounded-2xl"
+                    className="w-full h-64 md:h-80 object-cover rounded-3xl"
                   />
-                  <Badge className="absolute top-4 left-4 bg-lime-500/20 text-lime-400 border-lime-500/30">
+                  <Badge className="absolute top-4 left-4 bg-lime-100 text-lime-700 border-lime-200 rounded-full px-3 py-1">
                     {turf.type}
                   </Badge>
                 </div>
@@ -121,13 +121,13 @@ const TurfBooking = () => {
                       key={idx}
                       src={img}
                       alt={`${turf.name} ${idx + 2}`}
-                      className="w-full h-[152px] md:h-[152px] object-cover rounded-2xl"
+                      className="w-full h-[152px] md:h-[152px] object-cover rounded-3xl"
                     />
                   ))}
-                  <div className="relative bg-slate-800/50 rounded-2xl flex items-center justify-center border border-slate-700/50">
+                  <div className="relative bg-stone-100 rounded-3xl flex items-center justify-center border border-stone-200">
                     <div className="text-center">
-                      <Camera className="w-6 h-6 text-lime-400 mx-auto mb-2" />
-                      <span className="text-lime-400 text-sm font-medium">+5 more</span>
+                      <Camera className="w-6 h-6 text-stone-600 mx-auto mb-2" />
+                      <span className="text-stone-600 text-sm font-medium">+5 more</span>
                     </div>
                   </div>
                 </div>
@@ -140,46 +140,46 @@ const TurfBooking = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="backdrop-blur-sm bg-slate-800/50 border-slate-700/50">
+              <Card className="bg-white border border-stone-200 rounded-3xl shadow-sm">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-2xl text-white mb-2">{turf.name}</CardTitle>
-                      <div className="flex items-center space-x-4 text-slate-400">
+                      <CardTitle className="text-2xl text-stone-900 mb-2">{turf.name}</CardTitle>
+                      <div className="flex items-center space-x-4 text-stone-600">
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-1" />
                           {turf.location}
                         </div>
                         <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1 text-yellow-400 fill-current" />
+                          <Star className="w-4 h-4 mr-1 text-yellow-500 fill-current" />
                           {turf.rating} ({turf.reviews} reviews)
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-lime-400">৳{turf.price}</div>
-                      <div className="text-sm text-slate-400">per hour</div>
+                      <div className="text-2xl font-bold text-stone-900">৳{turf.price}</div>
+                      <div className="text-sm text-stone-600">per hour</div>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-300 mb-6">{turf.description}</p>
+                  <p className="text-stone-600 mb-6">{turf.description}</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     {turf.features.map((feature) => (
-                      <div key={feature} className="flex items-center space-x-2 text-slate-300">
+                      <div key={feature} className="flex items-center space-x-2 text-stone-700">
                         <div className="w-2 h-2 bg-lime-400 rounded-full"></div>
                         <span className="text-sm">{feature}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t border-slate-700/50 pt-6">
-                    <h4 className="text-white font-semibold mb-3">Rules & Guidelines</h4>
+                  <div className="border-t border-stone-200 pt-6">
+                    <h4 className="text-stone-900 font-semibold mb-3">Rules & Guidelines</h4>
                     <ul className="space-y-2">
                       {turf.rules.map((rule, idx) => (
-                        <li key={idx} className="flex items-center space-x-2 text-slate-400 text-sm">
-                          <Shield className="w-3 h-3 text-lime-400" />
+                        <li key={idx} className="flex items-center space-x-2 text-stone-600 text-sm">
+                          <Shield className="w-3 h-3 text-lime-600" />
                           <span>{rule}</span>
                         </li>
                       ))}
@@ -197,23 +197,23 @@ const TurfBooking = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="backdrop-blur-sm bg-slate-800/50 border-slate-700/50 sticky top-24">
+              <Card className="bg-white border border-stone-200 rounded-3xl shadow-sm sticky top-24">
                 <CardHeader>
-                  <CardTitle className="text-white">Reserve Your Slot</CardTitle>
+                  <CardTitle className="text-stone-900">Reserve Your Slot</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Date Selection */}
                   <div>
-                    <label className="block text-white font-medium mb-3">Select Date</label>
+                    <label className="block text-stone-900 font-medium mb-3">Select Date</label>
                     <div className="grid grid-cols-7 gap-2">
                       {dates.map((date) => (
                         <button
                           key={date.date}
                           onClick={() => setSelectedDate(date.date)}
-                          className={`p-3 rounded-xl text-center transition-all ${
+                          className={`p-3 rounded-2xl text-center transition-all ${
                             selectedDate === date.date
-                              ? 'bg-lime-500 text-slate-900'
-                              : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700'
+                              ? 'bg-lime-400 text-stone-900'
+                              : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
                           }`}
                         >
                           <div className="text-xs font-medium">{date.day}</div>
@@ -226,29 +226,29 @@ const TurfBooking = () => {
                   {/* Time Slots */}
                   {selectedDate && (
                     <div>
-                      <label className="block text-white font-medium mb-3">Available Time Slots</label>
+                      <label className="block text-stone-900 font-medium mb-3">Available Time Slots</label>
                       <div className="grid grid-cols-2 gap-2">
                         {timeSlots.map((slot) => (
                           <button
                             key={slot.time}
                             disabled={!slot.available}
                             onClick={() => setSelectedSlot(slot.time)}
-                            className={`p-3 rounded-xl text-center transition-all relative ${
+                            className={`p-3 rounded-2xl text-center transition-all relative ${
                               selectedSlot === slot.time
-                                ? 'bg-lime-500 text-slate-900'
+                                ? 'bg-lime-400 text-stone-900'
                                 : slot.available
-                                ? 'bg-slate-700/50 text-slate-300 hover:bg-slate-700'
-                                : 'bg-slate-800/50 text-slate-500 cursor-not-allowed'
+                                ? 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+                                : 'bg-stone-50 text-stone-400 cursor-not-allowed'
                             }`}
                           >
                             <div className="font-medium">{slot.time}</div>
                             {slot.prime && (
-                              <Badge className="absolute -top-1 -right-1 bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">
+                              <Badge className="absolute -top-1 -right-1 bg-yellow-100 text-yellow-700 border-yellow-200 text-xs rounded-full">
                                 Prime
                               </Badge>
                             )}
                             {!slot.available && (
-                              <div className="text-xs text-red-400">Booked</div>
+                              <div className="text-xs text-red-500">Booked</div>
                             )}
                           </button>
                         ))}
@@ -259,22 +259,22 @@ const TurfBooking = () => {
                   {/* Duration */}
                   {selectedSlot && (
                     <div>
-                      <label className="block text-white font-medium mb-3">Duration (hours)</label>
-                      <div className="flex items-center space-x-4">
+                      <label className="block text-stone-900 font-medium mb-3">Duration (hours)</label>
+                      <div className="flex items-center justify-center space-x-4 bg-stone-100 rounded-2xl p-4">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setSelectedDuration(Math.max(1, selectedDuration - 1))}
-                          className="border-slate-600 text-slate-300"
+                          className="border-stone-300 text-stone-700 rounded-xl"
                         >
                           -
                         </Button>
-                        <span className="text-white font-bold text-lg px-4">{selectedDuration}</span>
+                        <span className="text-stone-900 font-bold text-lg px-4">{selectedDuration}</span>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setSelectedDuration(Math.min(4, selectedDuration + 1))}
-                          className="border-slate-600 text-slate-300"
+                          className="border-stone-300 text-stone-700 rounded-xl"
                         >
                           +
                         </Button>
@@ -284,29 +284,29 @@ const TurfBooking = () => {
 
                   {/* Summary */}
                   {selectedSlot && (
-                    <div className="border-t border-slate-700/50 pt-6">
+                    <div className="border-t border-stone-200 pt-6">
                       <div className="space-y-3 mb-6">
-                        <div className="flex justify-between text-slate-300">
+                        <div className="flex justify-between text-stone-600">
                           <span>Base Price ({selectedDuration}h)</span>
                           <span>৳{turf.price * selectedDuration}</span>
                         </div>
                         {timeSlots.find(s => s.time === selectedSlot)?.prime && (
-                          <div className="flex justify-between text-slate-300">
+                          <div className="flex justify-between text-stone-600">
                             <span>Prime Time (50%)</span>
                             <span>৳{(turf.price * selectedDuration * 0.5)}</span>
                           </div>
                         )}
-                        <div className="border-t border-slate-700/50 pt-3">
-                          <div className="flex justify-between text-white font-bold text-lg">
+                        <div className="border-t border-stone-200 pt-3">
+                          <div className="flex justify-between text-stone-900 font-bold text-lg">
                             <span>Total</span>
-                            <span className="text-lime-400">৳{calculateTotal()}</span>
+                            <span className="text-lime-600">৳{calculateTotal()}</span>
                           </div>
                         </div>
                       </div>
 
                       <Button
                         onClick={() => navigate('/auth')}
-                        className="w-full bg-gradient-to-r from-lime-400 to-emerald-500 text-slate-900 hover:from-lime-500 hover:to-emerald-600 font-semibold py-3"
+                        className="w-full bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold py-4 rounded-2xl"
                       >
                         Reserve Now
                       </Button>
