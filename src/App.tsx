@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Turfs from "./pages/Turfs";
+import TurfBooking from "./pages/TurfBooking";
 import Tournaments from "./pages/Tournaments";
 import PlayerDashboard from "./pages/PlayerDashboard";
 import TurfOwnerDashboard from "./pages/TurfOwnerDashboard";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/turfs" element={<Turfs />} />
+          <Route path="/turf/:id" element={<TurfBooking />} />
           <Route path="/tournaments" element={<Tournaments />} />
           <Route path="/player" element={<PlayerDashboard />} />
           <Route path="/turf-owner" element={<TurfOwnerDashboard />} />
