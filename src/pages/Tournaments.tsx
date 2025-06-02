@@ -1,334 +1,236 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Calendar, Users, MapPin, Star, Clock, ArrowLeft, Play, Filter, ChevronRight } from 'lucide-react';
+import { Trophy, Calendar, MapPin, Users, Star, Clock, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
+import { EnhancedHeader } from '@/components/ui/enhanced-header';
+import { toast } from '@/hooks/use-toast';
 
 const Tournaments = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('upcoming');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   const tournaments = [
     {
       id: 1,
-      name: "Dhaka Champions League",
-      type: "7v7",
-      format: "Knockout",
+      name: "Summer Championship 2024",
+      status: "Open",
+      startDate: "2024-07-15",
+      endDate: "2024-07-28",
+      teams: 16,
+      maxTeams: 32,
       prize: "৳50,000",
-      entryFee: "৳5,000",
-      date: "Dec 15, 2024",
-      time: "9:00 AM",
-      location: "Champions Arena, Dhanmondi",
-      participants: 16,
-      maxParticipants: 32,
-      image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-      status: "upcoming",
-      organizer: "TurfMaster",
-      description: "Premier 7v7 tournament featuring the best teams in Dhaka"
+      location: "Dhaka Sports Complex",
+      format: "Knockout",
+      registrationFee: "৳2,000",
+      organizer: "Dhaka Football Association",
+      image: "/placeholder.svg"
     },
     {
       id: 2,
-      name: "Weekend Warriors Cup",
-      type: "5v5",
+      name: "Corporate Football League",
+      status: "Ongoing",
+      startDate: "2024-06-01",
+      endDate: "2024-08-30",
+      teams: 24,
+      maxTeams: 24,
+      prize: "৳1,00,000",
+      location: "Various Venues",
       format: "League",
-      prize: "৳25,000",
-      entryFee: "৳3,000",
-      date: "Dec 22, 2024",
-      time: "10:00 AM",
-      location: "Victory Ground, Gulshan",
-      participants: 12,
-      maxParticipants: 16,
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      status: "upcoming",
-      organizer: "Victory Sports",
-      description: "Fast-paced 5v5 league for weekend football enthusiasts"
+      registrationFee: "৳5,000",
+      organizer: "Corporate Sports BD",
+      image: "/placeholder.svg"
     },
     {
       id: 3,
-      name: "Corporate Football Championship",
-      type: "11v11",
-      format: "Round Robin + Playoffs",
-      prize: "৳100,000",
-      entryFee: "৳15,000",
-      date: "Jan 5, 2025",
-      time: "8:00 AM",
-      location: "Elite Football Hub, Banani",
-      participants: 8,
-      maxParticipants: 12,
-      image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
-      status: "upcoming",
-      organizer: "Corporate Sports League",
-      description: "Professional tournament for corporate teams across Bangladesh"
-    },
-    {
-      id: 4,
-      name: "Gulshan Winter Cup",
-      type: "7v7",
+      name: "Youth Football Cup",
+      status: "Open",
+      startDate: "2024-08-01",
+      endDate: "2024-08-15",
+      teams: 8,
+      maxTeams: 16,
+      prize: "৳25,000",
+      location: "Youth Sports Center",
       format: "Knockout",
-      prize: "৳30,000",
-      entryFee: "৳4,000",
-      date: "Nov 28, 2024",
-      time: "3:00 PM",
-      location: "Urban Sports Complex, Uttara",
-      participants: 32,
-      maxParticipants: 32,
-      image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
-      status: "ongoing",
-      organizer: "Gulshan FC",
-      description: "Winter tournament with teams from northern Dhaka"
-    },
-    {
-      id: 5,
-      name: "Young Guns Tournament",
-      type: "5v5",
-      format: "League",
-      prize: "৳20,000",
-      entryFee: "৳2,500",
-      date: "Nov 15, 2024",
-      time: "4:00 PM",
-      location: "Premier League Ground, Mirpur",
-      participants: 16,
-      maxParticipants: 16,
-      image: "https://images.unsplash.com/photo-1500673922987-e212871fec22",
-      status: "completed",
+      registrationFee: "৳1,500",
       organizer: "Youth Sports Foundation",
-      description: "Under-21 tournament to discover young talent"
+      image: "/placeholder.svg"
     }
   ];
 
-  const filteredTournaments = tournaments.filter(tournament => tournament.status === activeTab);
+  const handleJoinTournament = (tournamentId: number, tournamentName: string) => {
+    toast({
+      title: "Tournament Registration",
+      description: `Successfully registered for ${tournamentName}!`,
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Open': return 'bg-emerald-100 text-emerald-700';
+      case 'Ongoing': return 'bg-blue-100 text-blue-700';
+      case 'Completed': return 'bg-gray-100 text-gray-700';
+      default: return 'bg-yellow-100 text-yellow-700';
+    }
+  };
+
+  const filteredTournaments = tournaments.filter(tournament => {
+    const matchesSearch = tournament.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tournament.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = selectedStatus === 'all' || tournament.status.toLowerCase() === selectedStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/')}
-                className="text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <h1 className="text-2xl font-bold text-stone-900">
-                Tournaments
-              </h1>
-            </div>
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl px-6"
-            >
-              <Trophy className="w-4 h-4 mr-2" />
-              Join Tournament
-            </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50/30 via-white to-orange-50/30">
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-yellow-200/20 to-orange-200/20 rounded-full opacity-60 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-red-200/20 to-pink-200/20 rounded-full opacity-60 blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <EnhancedHeader />
+
+      <div className="container mx-auto px-4 py-8 relative">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-stone-900">
-            Football Tournaments
-          </h2>
-          <p className="text-stone-600 max-w-2xl mx-auto text-lg">
-            Compete with the best teams, win amazing prizes, and showcase your skills
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
+            Football Tournaments 🏆
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Join competitive tournaments and showcase your football skills
           </p>
         </motion.div>
 
-        {/* Tournament Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <div className="flex justify-center">
-              <TabsList className="bg-white border border-stone-200 rounded-2xl p-2">
-                <TabsTrigger 
-                  value="upcoming" 
-                  className="rounded-xl px-6 py-3 data-[state=active]:bg-lime-400 data-[state=active]:text-stone-900 font-semibold"
-                >
-                  Upcoming
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="ongoing" 
-                  className="rounded-xl px-6 py-3 data-[state=active]:bg-lime-400 data-[state=active]:text-stone-900 font-semibold"
-                >
-                  Ongoing
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="completed" 
-                  className="rounded-xl px-6 py-3 data-[state=active]:bg-lime-400 data-[state=active]:text-stone-900 font-semibold"
-                >
-                  Completed
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value={activeTab} className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                {filteredTournaments.map((tournament, index) => (
-                  <motion.div
-                    key={tournament.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    whileHover={{ y: -8 }}
-                    className="group cursor-pointer"
-                    onClick={() => navigate('/auth')}
-                  >
-                    <Card className="bg-white border border-stone-200 hover:shadow-2xl transition-all duration-300 overflow-hidden h-full rounded-3xl">
-                      <div className="relative">
-                        <img
-                          src={tournament.image}
-                          alt={tournament.name}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        
-                        {/* Status Badge */}
-                        <div className="absolute top-4 left-4">
-                          <Badge className={`
-                            ${tournament.status === 'upcoming' ? 'bg-blue-100 text-blue-700 border-blue-200' : ''}
-                            ${tournament.status === 'ongoing' ? 'bg-green-100 text-green-700 border-green-200' : ''}
-                            ${tournament.status === 'completed' ? 'bg-stone-100 text-stone-700 border-stone-200' : ''}
-                            rounded-full px-3 py-1 font-medium capitalize
-                          `}>
-                            {tournament.status}
-                          </Badge>
-                        </div>
-
-                        {/* Prize Badge */}
-                        <div className="absolute top-4 right-4">
-                          <Badge className="bg-white/95 text-stone-900 rounded-full px-3 py-1 font-bold shadow-sm">
-                            🏆 {tournament.prize}
-                          </Badge>
-                        </div>
-
-                        {/* Tournament Type */}
-                        <div className="absolute bottom-4 left-4">
-                          <Badge className="bg-lime-100 text-lime-700 border-lime-200 rounded-full px-3 py-1 font-medium">
-                            {tournament.type} • {tournament.format}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-stone-900 group-hover:text-lime-600 transition-colors text-xl">
-                          {tournament.name}
-                        </CardTitle>
-                        <CardDescription className="text-stone-600">
-                          {tournament.description}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="space-y-4">
-                        {/* Tournament Details */}
-                        <div className="space-y-3">
-                          <div className="flex items-center text-stone-600 text-sm">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            <span>{tournament.date} at {tournament.time}</span>
-                          </div>
-                          
-                          <div className="flex items-center text-stone-600 text-sm">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            <span>{tournament.location}</span>
-                          </div>
-
-                          <div className="flex items-center text-stone-600 text-sm">
-                            <Users className="w-4 h-4 mr-2" />
-                            <span>{tournament.participants}/{tournament.maxParticipants} teams</span>
-                          </div>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="w-full bg-stone-200 rounded-full h-2">
-                          <div 
-                            className="bg-lime-400 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${(tournament.participants / tournament.maxParticipants) * 100}%` }}
-                          ></div>
-                        </div>
-
-                        {/* Entry Fee and Action */}
-                        <div className="flex items-center justify-between pt-2">
-                          <div>
-                            <span className="text-stone-600 text-sm">Entry Fee:</span>
-                            <div className="text-stone-900 font-bold">{tournament.entryFee}</div>
-                          </div>
-                          
-                          <Button
-                            size="sm"
-                            disabled={tournament.status === 'completed' || tournament.participants >= tournament.maxParticipants}
-                            className="bg-lime-400 hover:bg-lime-500 text-stone-900 disabled:opacity-50 rounded-xl font-semibold"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate('/auth');
-                            }}
-                          >
-                            {tournament.status === 'completed' ? 'View Results' : 
-                             tournament.participants >= tournament.maxParticipants ? 'Full' : 'Join Now'}
-                          </Button>
-                        </div>
-
-                        {/* Organizer */}
-                        <div className="pt-3 border-t border-stone-200">
-                          <div className="flex items-center justify-between">
-                            <span className="text-stone-600 text-sm">Organized by</span>
-                            <span className="text-stone-900 font-medium text-sm">{tournament.organizer}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+        {/* Search and Filters */}
+        <Card className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl mb-8">
+          <CardContent className="p-8">
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search tournaments..."
+                  className="pl-12 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm text-lg py-6"
+                />
               </div>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
-
-        {/* Empty State */}
-        {filteredTournaments.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <div className="w-24 h-24 mx-auto mb-6 bg-stone-100 rounded-full flex items-center justify-center">
-              <Trophy className="w-12 h-12 text-stone-400" />
+              <div className="lg:w-48">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-full p-4 rounded-2xl border border-white/30 bg-white/50 backdrop-blur-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                >
+                  <option value="all">All Status</option>
+                  <option value="open">Open</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
             </div>
-            <h3 className="text-2xl font-semibold text-stone-900 mb-3">No tournaments found</h3>
-            <p className="text-stone-600 mb-8 max-w-md mx-auto">
-              {activeTab === 'upcoming' && "No upcoming tournaments at the moment. Check back soon!"}
-              {activeTab === 'ongoing' && "No tournaments currently in progress."}
-              {activeTab === 'completed' && "No completed tournaments to show."}
-            </p>
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-2xl font-semibold"
-            >
-              Back to Home
-            </Button>
-          </motion.div>
-        )}
+          </CardContent>
+        </Card>
 
-        {/* Load More */}
-        {filteredTournaments.length > 0 && (
-          <div className="text-center mt-12">
-            <Button
-              variant="outline"
-              className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl px-8 py-3 font-semibold"
+        {/* Tournament Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {filteredTournaments.map((tournament) => (
+            <motion.div
+              key={tournament.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -5 }}
+              className="group"
             >
-              Load More Tournaments
+              <Card className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden h-full">
+                <div className="relative">
+                  <img
+                    src={tournament.image}
+                    alt={tournament.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-4 right-4">
+                    <Badge className={`${getStatusColor(tournament.status)} rounded-2xl px-4 py-2 font-medium`}>
+                      {tournament.status}
+                    </Badge>
+                  </div>
+                  <div className="absolute bottom-4 left-4">
+                    <Badge className="bg-yellow-500 text-white rounded-2xl px-3 py-1">
+                      {tournament.format}
+                    </Badge>
+                  </div>
+                </div>
+
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl text-gray-800 group-hover:text-yellow-600 transition-colors">
+                    {tournament.name}
+                  </CardTitle>
+                  <div className="flex items-center text-gray-600 mt-2">
+                    <MapPin className="w-4 h-4 mr-1" />
+                    <span className="text-sm">{tournament.location}</span>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center text-gray-600">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      {tournament.startDate}
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Clock className="w-4 h-4 mr-2" />
+                      {tournament.endDate}
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Users className="w-4 h-4 mr-2" />
+                      {tournament.teams}/{tournament.maxTeams} teams
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <Trophy className="w-4 h-4 mr-2" />
+                      Prize: {tournament.prize}
+                    </div>
+                  </div>
+
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <div><span className="font-medium">Registration Fee:</span> {tournament.registrationFee}</div>
+                    <div><span className="font-medium">Organized by:</span> {tournament.organizer}</div>
+                  </div>
+
+                  <Button
+                    onClick={() => handleJoinTournament(tournament.id, tournament.name)}
+                    disabled={tournament.teams >= tournament.maxTeams}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white rounded-2xl py-3 shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                  >
+                    {tournament.teams >= tournament.maxTeams ? 'Tournament Full' : 'Join Tournament'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {filteredTournaments.length === 0 && (
+          <div className="text-center py-16">
+            <Trophy className="w-24 h-24 mx-auto mb-6 text-gray-400" />
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4">No tournaments found</h3>
+            <p className="text-gray-600 mb-8">Try adjusting your search criteria</p>
+            <Button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedStatus('all');
+              }}
+              variant="outline"
+              className="rounded-2xl border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+            >
+              Clear Filters
             </Button>
           </div>
         )}

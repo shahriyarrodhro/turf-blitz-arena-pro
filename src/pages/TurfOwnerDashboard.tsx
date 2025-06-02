@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, Calendar, MapPin, Users, DollarSign, Plus, Star, Clock, TrendingUp, Home, Settings, LogOut, Bell, Search, Filter } from 'lucide-react';
+import { BarChart3, Calendar, MapPin, Users, DollarSign, Plus, Star, Clock, TrendingUp, Bell, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppSidebar } from '@/components/ui/app-sidebar';
 import { ChatComponent } from '@/components/ui/chat-component';
 import { NotificationsComponent } from '@/components/ui/notifications';
 import { SettingsComponent } from '@/components/ui/settings';
+import { PaymentsPage } from '@/components/ui/dashboard-pages/payments-page';
 
 const TurfOwnerDashboard = () => {
   const navigate = useNavigate();
@@ -36,96 +36,14 @@ const TurfOwnerDashboard = () => {
     { label: 'Rating', value: '4.8', icon: Star, change: '124 reviews', color: 'from-yellow-500 to-orange-600' }
   ];
 
-  const todayBookings = [
-    {
-      id: 1,
-      time: "16:00 - 17:00",
-      turf: "Arena 1",
-      team: "Thunder Bolts FC",
-      contact: "+880 1711-123456",
-      status: "Confirmed",
-      payment: "Paid",
-      amount: "৳2,500"
-    },
-    {
-      id: 2,
-      time: "18:00 - 19:00", 
-      turf: "Arena 1",
-      team: "Victory Eagles",
-      contact: "+880 1812-987654",
-      status: "Confirmed",
-      payment: "Paid",
-      amount: "৳2,500"
-    },
-    {
-      id: 3,
-      time: "20:00 - 21:00",
-      turf: "Arena 2", 
-      team: "Lightning Strikers",
-      contact: "+880 1911-555666",
-      status: "Pending",
-      payment: "Pending",
-      amount: "৳3,000"
-    }
-  ];
-
-  const turfs = [
-    {
-      id: 1,
-      name: "Champions Arena 1",
-      type: "7v7",
-      status: "Active",
-      bookingsToday: 5,
-      revenue: 12500,
-      rating: 4.8,
-      nextBooking: "16:00",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 2,
-      name: "Champions Arena 2", 
-      type: "5v5",
-      status: "Active",
-      bookingsToday: 3,
-      revenue: 7500,
-      rating: 4.6,
-      nextBooking: "20:00",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 3,
-      name: "Champions Arena 3",
-      type: "11v11", 
-      status: "Maintenance",
-      bookingsToday: 0,
-      revenue: 0,
-      rating: 4.9,
-      nextBooking: "N/A",
-      image: "/placeholder.svg"
-    }
-  ];
-
-  const recentReviews = [
-    {
-      id: 1,
-      customer: "Ahmed Rahman",
-      rating: 5,
-      comment: "Excellent turf quality and facilities. Will definitely book again!",
-      date: "2024-05-30",
-      turf: "Arena 1"
-    },
-    {
-      id: 2,
-      customer: "Sakib Hassan", 
-      rating: 4,
-      comment: "Good experience overall. Could improve lighting in evening slots.",
-      date: "2024-05-29",
-      turf: "Arena 2"
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50/30 via-white to-teal-50/30 flex">
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-gradient-to-r from-emerald-200/15 to-teal-200/15 rounded-full opacity-60 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-gradient-to-r from-blue-200/15 to-purple-200/15 rounded-full opacity-60 blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
       {/* Sidebar */}
       <AppSidebar
         userRole="turf-owner"
@@ -137,13 +55,15 @@ const TurfOwnerDashboard = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        {/* Header */}
-        <div className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200/50">
+      <div className="flex-1 overflow-auto relative">
+        {/* Enhanced Header */}
+        <div className="sticky top-0 z-40 backdrop-blur-2xl bg-white/30 border-b border-white/40 shadow-2xl">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Turf Owner Dashboard</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Turf Owner Dashboard
+                </h1>
                 <p className="text-gray-600">Champions Sports Dashboard 🏟️</p>
               </div>
               
@@ -152,24 +72,16 @@ const TurfOwnerDashboard = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="Search bookings..."
-                    className="pl-10 w-64 rounded-xl border-gray-200 bg-white/50 backdrop-blur-sm"
+                    className="pl-10 w-64 rounded-2xl border-white/30 bg-white/40 backdrop-blur-md placeholder:text-gray-500"
                   />
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
+                  className="rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40"
                   onClick={() => setIsNotificationsOpen(true)}
                 >
                   <Bell className="w-5 h-5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
-                  onClick={() => setIsSettingsOpen(true)}
-                >
-                  <Settings className="w-5 h-5" />
                 </Button>
               </div>
             </div>
@@ -177,7 +89,7 @@ const TurfOwnerDashboard = () => {
         </div>
 
         <div className="p-6">
-          {/* Stats Overview */}
+          {/* Enhanced Stats Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -185,11 +97,11 @@ const TurfOwnerDashboard = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
           >
             {stats.map((stat, index) => (
-              <Card key={stat.label} className="backdrop-blur-sm bg-white/60 border-gray-200/50 hover:shadow-lg transition-all duration-300">
+              <Card key={stat.label} className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="w-6 h-6 text-white" />
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-300`}>
+                      <stat.icon className="w-7 h-7 text-white" />
                     </div>
                     <TrendingUp className="w-4 h-4 text-emerald-600" />
                   </div>
@@ -201,44 +113,44 @@ const TurfOwnerDashboard = () => {
             ))}
           </motion.div>
 
-          {/* Main Content */}
-          <Card className="backdrop-blur-sm bg-white/60 border-gray-200/50">
-            <CardContent className="p-6">
+          {/* Enhanced Main Content */}
+          <Card className="backdrop-blur-2xl bg-white/30 border border-white/30 rounded-3xl shadow-2xl">
+            <CardContent className="p-8">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-6 bg-gray-100/50 rounded-xl p-1 mb-8">
+                <TabsList className="grid w-full grid-cols-6 bg-white/40 backdrop-blur-sm rounded-2xl p-1 mb-8 shadow-lg border border-white/20">
                   <TabsTrigger 
                     value="overview" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
                     value="bookings" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Bookings
                   </TabsTrigger>
                   <TabsTrigger 
                     value="turfs" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     My Turfs
                   </TabsTrigger>
                   <TabsTrigger 
                     value="reviews" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Reviews
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Analytics
                   </TabsTrigger>
                   <TabsTrigger 
                     value="revenue" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Revenue
                   </TabsTrigger>
@@ -247,7 +159,7 @@ const TurfOwnerDashboard = () => {
                 <TabsContent value="overview" className="space-y-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Today's Performance */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30">
+                    <Card className="backdrop-blur-xl bg-white/40 border border-white/30 rounded-3xl shadow-xl">
                       <CardHeader>
                         <CardTitle className="text-gray-800 flex items-center">
                           <BarChart3 className="w-5 h-5 mr-2 text-emerald-600" />
@@ -275,7 +187,7 @@ const TurfOwnerDashboard = () => {
                     </Card>
 
                     {/* Quick Actions */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30">
+                    <Card className="backdrop-blur-xl bg-white/40 border border-white/30 rounded-3xl shadow-xl">
                       <CardHeader>
                         <CardTitle className="text-gray-800 flex items-center">
                           <Plus className="w-5 h-5 mr-2 text-emerald-600" />
@@ -302,42 +214,38 @@ const TurfOwnerDashboard = () => {
 
                 <TabsContent value="bookings" className="space-y-6">
                   <div className="text-center py-16">
-                    <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Bookings Management</h3>
-                    <p className="text-gray-600">Manage your turf bookings and approvals</p>
+                    <Calendar className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Bookings Management</h3>
+                    <p className="text-gray-600 text-lg">Manage your turf bookings and approvals</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="turfs" className="space-y-6">
                   <div className="text-center py-16">
-                    <MapPin className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Turf Management</h3>
-                    <p className="text-gray-600">Manage your turf listings and settings</p>
+                    <MapPin className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Turf Management</h3>
+                    <p className="text-gray-600 text-lg">Manage your turf listings and settings</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="reviews" className="space-y-6">
                   <div className="text-center py-16">
-                    <Star className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Reviews & Ratings</h3>
-                    <p className="text-gray-600">View and respond to customer reviews</p>
+                    <Star className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Reviews & Ratings</h3>
+                    <p className="text-gray-600 text-lg">View and respond to customer reviews</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="analytics" className="space-y-6">
                   <div className="text-center py-16">
-                    <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Business Analytics</h3>
-                    <p className="text-gray-600">Detailed insights and performance metrics</p>
+                    <BarChart3 className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Business Analytics</h3>
+                    <p className="text-gray-600 text-lg">Detailed insights and performance metrics</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="revenue" className="space-y-6">
-                  <div className="text-center py-16">
-                    <DollarSign className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Revenue Management</h3>
-                    <p className="text-gray-600">Track earnings and financial performance</p>
-                  </div>
+                  <PaymentsPage />
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -345,7 +253,7 @@ const TurfOwnerDashboard = () => {
         </div>
       </div>
 
-      {/* Overlays */}
+      {/* Enhanced Overlays */}
       <ChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <NotificationsComponent isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
       <SettingsComponent isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />

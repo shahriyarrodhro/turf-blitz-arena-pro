@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Trophy, Users, MapPin, TrendingUp, Search, Bell, Settings, Clock, Star } from 'lucide-react';
+import { Calendar, Trophy, Users, MapPin, TrendingUp, Search, Bell, Settings, Clock, Star, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,10 @@ import { ChatComponent } from '@/components/ui/chat-component';
 import { NotificationsComponent } from '@/components/ui/notifications';
 import { SettingsComponent } from '@/components/ui/settings';
 import { MatchmakingComponent } from '@/components/ui/matchmaking';
+import { PlayerOverview } from '@/components/ui/dashboard-pages/player-overview';
+import { PlayerTeam } from '@/components/ui/dashboard-pages/player-team';
+import { TournamentsPage } from '@/components/ui/dashboard-pages/tournaments-page';
+import { PaymentsPage } from '@/components/ui/dashboard-pages/payments-page';
 
 const PlayerDashboard = () => {
   const navigate = useNavigate();
@@ -45,7 +49,13 @@ const PlayerDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 flex">
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-emerald-200/20 to-teal-200/20 rounded-full opacity-60 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-blue-200/20 to-purple-200/20 rounded-full opacity-60 blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
       {/* Sidebar */}
       <AppSidebar
         userRole="player"
@@ -57,34 +67,37 @@ const PlayerDashboard = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        {/* Header */}
-        <div className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200/50">
+      <div className="flex-1 overflow-auto relative">
+        {/* Enhanced Header */}
+        <div className="sticky top-0 z-40 backdrop-blur-2xl bg-white/30 border-b border-white/40 shadow-2xl">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Player Dashboard</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Player Dashboard
+                </h1>
                 <p className="text-gray-600">Welcome back, {user?.name} ⚽</p>
               </div>
               
               <div className="flex items-center space-x-4">
                 <Button
                   onClick={() => setIsMatchmakingOpen(true)}
-                  className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl"
+                  className="bg-gradient-to-r from-lime-400 to-emerald-500 hover:from-lime-500 hover:to-emerald-600 text-white font-semibold rounded-3xl px-6 py-3 shadow-xl border border-white/20 backdrop-blur-sm transition-all duration-300 hover:scale-105"
                 >
+                  <Target className="w-5 h-5 mr-2" />
                   Find Match
                 </Button>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="Search matches..."
-                    className="pl-10 w-64 rounded-xl border-gray-200 bg-white/50 backdrop-blur-sm"
+                    className="pl-10 w-64 rounded-2xl border-white/30 bg-white/40 backdrop-blur-md placeholder:text-gray-500"
                   />
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
+                  className="rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40"
                   onClick={() => setIsNotificationsOpen(true)}
                 >
                   <Bell className="w-5 h-5" />
@@ -92,7 +105,7 @@ const PlayerDashboard = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
+                  className="rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40"
                   onClick={() => setIsSettingsOpen(true)}
                 >
                   <Settings className="w-5 h-5" />
@@ -103,7 +116,7 @@ const PlayerDashboard = () => {
         </div>
 
         <div className="p-6">
-          {/* Stats Overview */}
+          {/* Enhanced Stats Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -111,11 +124,11 @@ const PlayerDashboard = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
           >
             {stats.map((stat, index) => (
-              <Card key={stat.label} className="backdrop-blur-sm bg-white/60 border-gray-200/50 hover:shadow-lg transition-all duration-300 rounded-3xl">
+              <Card key={stat.label} className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="w-6 h-6 text-white" />
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-300`}>
+                      <stat.icon className="w-7 h-7 text-white" />
                     </div>
                     <TrendingUp className="w-4 h-4 text-emerald-600" />
                   </div>
@@ -127,129 +140,67 @@ const PlayerDashboard = () => {
             ))}
           </motion.div>
 
-          {/* Main Content */}
-          <Card className="backdrop-blur-sm bg-white/60 border-gray-200/50 rounded-3xl">
-            <CardContent className="p-6">
+          {/* Enhanced Main Content */}
+          <Card className="backdrop-blur-2xl bg-white/30 border border-white/30 rounded-3xl shadow-2xl">
+            <CardContent className="p-8">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-6 bg-gray-100/50 rounded-xl p-1 mb-8">
+                <TabsList className="grid w-full grid-cols-6 bg-white/40 backdrop-blur-sm rounded-2xl p-1 mb-8 shadow-lg border border-white/20">
                   <TabsTrigger 
                     value="overview" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
                     value="bookings" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
-                    My Bookings
+                    Bookings
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="matches" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    value="team" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
-                    Matches
+                    My Team
                   </TabsTrigger>
                   <TabsTrigger 
                     value="tournaments" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     Tournaments
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="teams" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    value="payments" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
-                    Teams
+                    Payments
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="profile" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    value="achievements" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
-                    Profile
+                    Achievements
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Recent Bookings */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30 rounded-3xl">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <Calendar className="w-5 h-5 mr-2 text-emerald-600" />
-                          Recent Bookings
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {userBookings.length > 0 ? (
-                          userBookings.slice(0, 3).map((booking) => (
-                            <div key={booking.id} className="flex items-center justify-between p-4 bg-white/50 rounded-2xl">
-                              <div>
-                                <h4 className="font-medium text-gray-800">{booking.turfName}</h4>
-                                <p className="text-sm text-gray-600">{booking.date} at {booking.time}</p>
-                              </div>
-                              <Badge className={`${
-                                booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                              } rounded-full`}>
-                                {booking.status}
-                              </Badge>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-8">
-                            <Calendar className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                            <p className="text-gray-600">No bookings yet</p>
-                            <Button 
-                              onClick={() => navigate('/turfs')}
-                              className="mt-2 bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-xl"
-                            >
-                              Book a Turf
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    {/* Upcoming Matches */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30 rounded-3xl">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <Trophy className="w-5 h-5 mr-2 text-emerald-600" />
-                          Upcoming Matches
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-center py-8">
-                          <Trophy className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                          <p className="text-gray-600">No upcoming matches</p>
-                          <Button 
-                            onClick={() => setIsMatchmakingOpen(true)}
-                            className="mt-2 bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-xl"
-                          >
-                            Find Match
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <PlayerOverview />
                 </TabsContent>
 
                 <TabsContent value="bookings" className="space-y-6">
                   <div className="space-y-4">
                     {userBookings.length > 0 ? (
                       userBookings.map((booking) => (
-                        <Card key={booking.id} className="backdrop-blur-sm bg-white/40 border-gray-200/30 rounded-3xl">
+                        <Card key={booking.id} className="backdrop-blur-xl bg-white/40 border border-white/30 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300">
                           <CardContent className="p-6">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
-                                <div className="w-12 h-12 bg-lime-100 rounded-2xl flex items-center justify-center">
-                                  <MapPin className="w-6 h-6 text-lime-600" />
+                                <div className="w-14 h-14 bg-gradient-to-r from-lime-400 to-emerald-500 rounded-3xl flex items-center justify-center shadow-lg">
+                                  <MapPin className="w-7 h-7 text-white" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-gray-800">{booking.turfName}</h3>
-                                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                  <h3 className="font-semibold text-gray-800 text-lg">{booking.turfName}</h3>
+                                  <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
                                     <span className="flex items-center">
                                       <Calendar className="w-4 h-4 mr-1" />
                                       {booking.date}
@@ -262,12 +213,12 @@ const PlayerDashboard = () => {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="text-lg font-bold text-gray-800">৳{booking.totalAmount}</div>
+                                <div className="text-xl font-bold text-gray-800">৳{booking.totalAmount}</div>
                                 <Badge className={`${
-                                  booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                                  booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
                                   booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                                   'bg-red-100 text-red-700'
-                                } rounded-full`}>
+                                } rounded-2xl px-4 py-2 mt-2`}>
                                   {booking.status}
                                 </Badge>
                               </div>
@@ -277,12 +228,12 @@ const PlayerDashboard = () => {
                       ))
                     ) : (
                       <div className="text-center py-16">
-                        <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">No Bookings Yet</h3>
-                        <p className="text-gray-600 mb-8">Start booking turfs to see them here</p>
+                        <Calendar className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">No Bookings Yet</h3>
+                        <p className="text-gray-600 mb-8 text-lg">Start booking turfs to see them here</p>
                         <Button 
                           onClick={() => navigate('/turfs')}
-                          className="bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-2xl font-semibold"
+                          className="bg-gradient-to-r from-lime-400 to-emerald-500 hover:from-lime-500 hover:to-emerald-600 text-white rounded-3xl font-semibold px-8 py-4 shadow-xl transition-all duration-300 hover:scale-105"
                         >
                           Browse Turfs
                         </Button>
@@ -291,35 +242,23 @@ const PlayerDashboard = () => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="matches" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Match History</h3>
-                    <p className="text-gray-600">Your match history and statistics</p>
-                  </div>
+                <TabsContent value="team" className="space-y-6">
+                  <PlayerTeam />
                 </TabsContent>
 
                 <TabsContent value="tournaments" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Trophy className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Tournament History</h3>
-                    <p className="text-gray-600">View your tournament participation and achievements</p>
-                  </div>
+                  <TournamentsPage />
                 </TabsContent>
 
-                <TabsContent value="teams" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Team Management</h3>
-                    <p className="text-gray-600">Create and manage your teams</p>
-                  </div>
+                <TabsContent value="payments" className="space-y-6">
+                  <PaymentsPage />
                 </TabsContent>
 
-                <TabsContent value="profile" className="space-y-6">
+                <TabsContent value="achievements" className="space-y-6">
                   <div className="text-center py-16">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Profile Settings</h3>
-                    <p className="text-gray-600">Manage your profile and preferences</p>
+                    <Star className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Achievements & Trophies</h3>
+                    <p className="text-gray-600 text-lg">Your football journey and accomplishments</p>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -328,7 +267,7 @@ const PlayerDashboard = () => {
         </div>
       </div>
 
-      {/* Overlays */}
+      {/* Enhanced Overlays */}
       <ChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <NotificationsComponent isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
       <SettingsComponent isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />

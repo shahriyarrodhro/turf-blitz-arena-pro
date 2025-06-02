@@ -40,18 +40,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ];
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('turfx_user');
-    if (savedUser) {
+    // Check for existing session with more robust validation
+    const checkAuth = () => {
       try {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+        const savedUser = localStorage.getItem('turfx_user');
+        const sessionExpiry = localStorage.getItem('turfx_session_expiry');
+        
+        if (savedUser && sessionExpiry) {
+          const expiryTime = parseInt(sessionExpiry);
+          const currentTime = Date.now();
+          
+          // Check if session is still valid (24 hours)
+          if (currentTime < expiryTime) {
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+          } else {
+            // Session expired, clear storage
+            localStorage.removeItem('turfx_user');
+            localStorage.removeItem('turfx_session_expiry');
+          }
+        }
       } catch (error) {
-        console.error('Error parsing saved user:', error);
+        console.error('Error checking auth:', error);
         localStorage.removeItem('turfx_user');
+        localStorage.removeItem('turfx_session_expiry');
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -64,8 +81,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (foundUser) {
       const { password: _, ...userWithoutPassword } = foundUser;
+      
+      // Set session expiry to 24 hours from now
+      const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
+      
       setUser(userWithoutPassword);
       localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
+      localStorage.setItem('turfx_session_expiry', expiryTime.toString());
       setIsLoading(false);
       return true;
     }
@@ -77,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('turfx_user');
+    localStorage.removeItem('turfx_session_expiry');
   };
 
   const updateUser = (userData: Partial<User>) => {

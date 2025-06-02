@@ -1,17 +1,19 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, MapPin, Trophy, DollarSign, Shield, AlertTriangle, TrendingUp, Activity, Settings, Home, LogOut, Bell, Search, Filter, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Users, MapPin, Trophy, DollarSign, Shield, AlertTriangle, TrendingUp, Activity, Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppSidebar } from '@/components/ui/app-sidebar';
 import { ChatComponent } from '@/components/ui/chat-component';
 import { NotificationsComponent } from '@/components/ui/notifications';
 import { SettingsComponent } from '@/components/ui/settings';
+import { AdminOverview } from '@/components/ui/dashboard-pages/admin-overview';
+import { PaymentsPage } from '@/components/ui/dashboard-pages/payments-page';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -36,103 +38,14 @@ const AdminDashboard = () => {
     { label: 'Platform Revenue', value: '৳2.4M', icon: DollarSign, change: '+18% this month', color: 'from-purple-500 to-pink-600' }
   ];
 
-  const pendingApprovals = [
-    {
-      id: 1,
-      type: 'Turf Verification',
-      name: 'Elite Sports Arena',
-      owner: 'Rafiq Ahmed',
-      location: 'Uttara, Dhaka',
-      submitted: '2024-05-30',
-      priority: 'High',
-      description: 'New turf registration with premium facilities'
-    },
-    {
-      id: 2,
-      type: 'Tournament Creation',
-      name: 'Summer Championship 2024',
-      organizer: 'Sports Club BD',
-      location: 'Gulshan, Dhaka', 
-      submitted: '2024-05-29',
-      priority: 'Medium',
-      description: 'City-wide football tournament with 64 teams'
-    },
-    {
-      id: 3,
-      type: 'Dispute Resolution',
-      name: 'Booking Cancellation Issue',
-      complainant: 'Ahmed Hassan',
-      location: 'Dhanmondi, Dhaka',
-      submitted: '2024-05-28',
-      priority: 'High',
-      description: 'Customer complaint about unfair cancellation policy'
-    }
-  ];
-
-  const recentActivity = [
-    {
-      id: 1,
-      action: 'New turf registered',
-      details: 'Champions Ground in Mirpur',
-      time: '2 minutes ago',
-      type: 'turf',
-      user: 'Sports Arena Ltd'
-    },
-    {
-      id: 2,
-      action: 'Tournament completed',
-      details: 'Spring Cup 2024 - Winners announced',
-      time: '1 hour ago',
-      type: 'tournament',
-      user: 'Tournament Organizer'
-    },
-    {
-      id: 3,
-      action: 'User reported',
-      details: 'Inappropriate behavior during match',
-      time: '3 hours ago',
-      type: 'report',
-      user: 'Ahmed Rahman'
-    },
-    {
-      id: 4,
-      action: 'Payment processed',
-      details: '৳15,000 commission received',
-      time: '6 hours ago',
-      type: 'payment',
-      user: 'System'
-    }
-  ];
-
-  const userStats = [
-    { type: 'Total Players', count: 10234, change: '+156', color: 'text-blue-600' },
-    { type: 'Turf Owners', count: 156, change: '+8', color: 'text-emerald-600' },
-    { type: 'Active Today', count: 2847, change: '+12%', color: 'text-purple-600' },
-    { type: 'Banned Users', count: 12, change: '-3', color: 'text-red-600' }
-  ];
-
-  const getActionIcon = (type: string) => {
-    switch (type) {
-      case 'turf': return <MapPin className="w-4 h-4" />;
-      case 'tournament': return <Trophy className="w-4 h-4" />;
-      case 'report': return <AlertTriangle className="w-4 h-4" />;
-      case 'payment': return <DollarSign className="w-4 h-4" />;
-      default: return <Activity className="w-4 h-4" />;
-    }
-  };
-
-  const getActionColor = (type: string) => {
-    switch (type) {
-      case 'turf': return 'text-emerald-600 bg-emerald-100';
-      case 'tournament': return 'text-yellow-600 bg-yellow-100';
-      case 'report': return 'text-red-600 bg-red-100';
-      case 'payment': return 'text-purple-600 bg-purple-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50/30 via-blue-50/20 to-purple-50/30 flex">
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-gradient-to-r from-blue-200/15 to-purple-200/15 rounded-full opacity-60 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-gradient-to-r from-emerald-200/15 to-teal-200/15 rounded-full opacity-60 blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
       {/* Sidebar */}
       <AppSidebar
         userRole="admin"
@@ -144,14 +57,16 @@ const AdminDashboard = () => {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        {/* Header */}
-        <div className="sticky top-0 z-40 backdrop-blur-md bg-white/80 border-b border-gray-200/50">
+      <div className="flex-1 overflow-auto relative">
+        {/* Enhanced Header */}
+        <div className="sticky top-0 z-40 backdrop-blur-2xl bg-white/30 border-b border-white/40 shadow-2xl">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-                <p className="text-gray-600">Monitor platform performance and manage the TurfMaster ecosystem 🛡️</p>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Admin Dashboard
+                </h1>
+                <p className="text-gray-600">Monitor platform performance and manage the TurfX ecosystem 🛡️</p>
               </div>
               
               <div className="flex items-center space-x-4">
@@ -159,24 +74,16 @@ const AdminDashboard = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="Search users, turfs..."
-                    className="pl-10 w-64 rounded-xl border-gray-200 bg-white/50 backdrop-blur-sm"
+                    className="pl-10 w-64 rounded-2xl border-white/30 bg-white/40 backdrop-blur-md placeholder:text-gray-500"
                   />
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
+                  className="rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40"
                   onClick={() => setIsNotificationsOpen(true)}
                 >
                   <Bell className="w-5 h-5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="rounded-xl hover:bg-gray-100"
-                  onClick={() => setIsSettingsOpen(true)}
-                >
-                  <Settings className="w-5 h-5" />
                 </Button>
               </div>
             </div>
@@ -184,7 +91,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="p-6">
-          {/* Platform Stats */}
+          {/* Enhanced Platform Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -192,11 +99,11 @@ const AdminDashboard = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
           >
             {platformStats.map((stat, index) => (
-              <Card key={stat.label} className="backdrop-blur-sm bg-white/60 border-gray-200/50 hover:shadow-lg transition-all duration-300">
+              <Card key={stat.label} className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="w-6 h-6 text-white" />
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-xl group-hover:scale-110 transition-all duration-300`}>
+                      <stat.icon className="w-7 h-7 text-white" />
                     </div>
                     <TrendingUp className="w-4 h-4 text-emerald-600" />
                   </div>
@@ -208,136 +115,87 @@ const AdminDashboard = () => {
             ))}
           </motion.div>
 
-          {/* Main Content */}
-          <Card className="backdrop-blur-sm bg-white/60 border-gray-200/50">
-            <CardContent className="p-6">
+          {/* Enhanced Main Content */}
+          <Card className="backdrop-blur-2xl bg-white/30 border border-white/30 rounded-3xl shadow-2xl">
+            <CardContent className="p-8">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-6 bg-gray-100/50 rounded-xl p-1 mb-8">
+                <TabsList className="grid w-full grid-cols-6 bg-white/40 backdrop-blur-sm rounded-2xl p-1 mb-8 shadow-lg border border-white/20">
                   <TabsTrigger 
                     value="overview" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
                     value="approvals" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Approvals
                   </TabsTrigger>
                   <TabsTrigger 
                     value="users" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Users & Turfs
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Analytics
                   </TabsTrigger>
                   <TabsTrigger 
                     value="reports" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Reports
                   </TabsTrigger>
                   <TabsTrigger 
                     value="revenue" 
-                    className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
                     Revenue
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Recent Activity */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <Activity className="w-5 h-5 mr-2 text-emerald-600" />
-                          Recent Activity
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-100 text-emerald-600">
-                            <MapPin className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="text-gray-800 text-sm font-medium">New turf registered</div>
-                            <div className="text-gray-600 text-xs">Champions Ground in Mirpur</div>
-                            <div className="text-gray-500 text-xs">2 minutes ago • Sports Arena Ltd</div>
-                          </div>
-                        </div>
-                        {/* Add more activity items */}
-                      </CardContent>
-                    </Card>
-
-                    {/* User Statistics */}
-                    <Card className="backdrop-blur-sm bg-white/40 border-gray-200/30">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <Users className="w-5 h-5 mr-2 text-emerald-600" />
-                          User Statistics
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-gray-800 font-medium">Total Players</div>
-                            <div className="text-xs text-blue-600">+156</div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-gray-800 font-bold text-lg">10,234</div>
-                          </div>
-                        </div>
-                        {/* Add more user stats */}
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <AdminOverview />
                 </TabsContent>
 
                 <TabsContent value="approvals" className="space-y-6">
                   <div className="text-center py-16">
-                    <Shield className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Pending Approvals</h3>
-                    <p className="text-gray-600">Review and approve platform submissions</p>
+                    <Shield className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Pending Approvals</h3>
+                    <p className="text-gray-600 text-lg">Review and approve platform submissions</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="users" className="space-y-6">
                   <div className="text-center py-16">
-                    <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">User & Turf Management</h3>
-                    <p className="text-gray-600">Manage users, turfs, and platform entities</p>
+                    <Users className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">User & Turf Management</h3>
+                    <p className="text-gray-600 text-lg">Manage users, turfs, and platform entities</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="analytics" className="space-y-6">
                   <div className="text-center py-16">
-                    <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Platform Analytics</h3>
-                    <p className="text-gray-600">Detailed insights and performance metrics</p>
+                    <TrendingUp className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Platform Analytics</h3>
+                    <p className="text-gray-600 text-lg">Detailed insights and performance metrics</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="reports" className="space-y-6">
                   <div className="text-center py-16">
-                    <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Reports & Issues</h3>
-                    <p className="text-gray-600">Handle user reports and platform issues</p>
+                    <AlertTriangle className="w-20 h-20 mx-auto mb-6 text-gray-400" />
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Reports & Issues</h3>
+                    <p className="text-gray-600 text-lg">Handle user reports and platform issues</p>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="revenue" className="space-y-6">
-                  <div className="text-center py-16">
-                    <DollarSign className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Revenue Management</h3>
-                    <p className="text-gray-600">Track platform revenue and financial metrics</p>
-                  </div>
+                  <PaymentsPage />
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -345,7 +203,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Overlays */}
+      {/* Enhanced Overlays */}
       <ChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <NotificationsComponent isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
       <SettingsComponent isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />

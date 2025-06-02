@@ -1,383 +1,309 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Star, MapPin, Clock, Users, Calendar, ArrowLeft, Play, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Search, Filter, MapPin, Star, Users, Clock, ArrowRight, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
+import { EnhancedHeader } from '@/components/ui/enhanced-header';
 
 const Turfs = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('all');
-  const [selectedType, setSelectedType] = useState('all');
-  const [sortBy, setSortBy] = useState('popular');
+  const [selectedPrice, setSelectedPrice] = useState('all');
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   const turfs = [
     {
       id: 1,
-      name: "Champions Arena",
-      location: "Dhanmondi, Dhaka",
-      type: "7v7",
+      name: "Elite Sports Arena",
+      location: "Gulshan, Dhaka",
       rating: 4.8,
       reviews: 124,
-      price: 2500,
-      image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-      features: ["Floodlights", "Parking", "Changing Room"],
-      availableSlots: 8,
-      nextAvailable: "6:00 PM",
-      distance: "1.2 km"
+      pricePerHour: 2500,
+      images: ["/placeholder.svg"],
+      amenities: ["Parking", "Changing Rooms", "Floodlights", "Refreshments"],
+      type: "7v7",
+      available: true,
+      description: "Premium football turf with state-of-the-art facilities"
     },
     {
       id: 2,
-      name: "Victory Ground",
-      location: "Gulshan, Dhaka", 
-      type: "5v5",
+      name: "Champions Ground",
+      location: "Dhanmondi, Dhaka", 
       rating: 4.6,
       reviews: 89,
-      price: 1800,
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      features: ["Air Conditioning", "Canteen", "First Aid"],
-      availableSlots: 12,
-      nextAvailable: "7:00 PM",
-      distance: "2.1 km"
+      pricePerHour: 2000,
+      images: ["/placeholder.svg"],
+      amenities: ["Parking", "Changing Rooms", "Floodlights"],
+      type: "5v5",
+      available: true,
+      description: "Perfect for smaller teams and quick matches"
     },
     {
       id: 3,
-      name: "Elite Football Hub",
-      location: "Banani, Dhaka",
-      type: "11v11", 
+      name: "Victory Sports Complex",
+      location: "Uttara, Dhaka",
       rating: 4.9,
-      reviews: 203,
-      price: 4500,
-      image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
-      features: ["Professional Grass", "Stadium Seating", "Scoreboard"],
-      availableSlots: 4,
-      nextAvailable: "8:00 PM",
-      distance: "3.5 km"
+      reviews: 156,
+      pricePerHour: 3000,
+      images: ["/placeholder.svg"],
+      amenities: ["Parking", "Changing Rooms", "Floodlights", "Refreshments", "AC Lounge"],
+      type: "11v11",
+      available: false,
+      description: "Full-size professional football ground"
     },
     {
       id: 4,
-      name: "Urban Sports Complex",
-      location: "Uttara, Dhaka",
-      type: "7v7",
-      rating: 4.5,
-      reviews: 156,
-      price: 2200,
-      image: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
-      features: ["Synthetic Turf", "Lighting", "Security"],
-      availableSlots: 6,
-      nextAvailable: "5:30 PM",
-      distance: "5.2 km"
-    },
-    {
-      id: 5,
-      name: "Premier League Ground",
+      name: "Street Football Court",
       location: "Mirpur, Dhaka",
-      type: "5v5",
-      rating: 4.7,
-      reviews: 198,
-      price: 1900,
-      image: "https://images.unsplash.com/photo-1500673922987-e212871fec22",
-      features: ["Indoor", "Air Conditioning", "Refreshments"],
-      availableSlots: 10,
-      nextAvailable: "6:30 PM",
-      distance: "4.8 km"
-    },
-    {
-      id: 6,
-      name: "Grassroots Arena",
-      location: "Wari, Dhaka",
-      type: "7v7",
       rating: 4.4,
-      reviews: 87,
-      price: 2100,
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
-      features: ["Natural Grass", "Coaching Available", "Equipment Rental"],
-      availableSlots: 7,
-      nextAvailable: "7:30 PM",
-      distance: "6.1 km"
+      reviews: 67,
+      pricePerHour: 1500,
+      images: ["/placeholder.svg"],
+      amenities: ["Parking", "Floodlights"],
+      type: "5v5",
+      available: true,
+      description: "Affordable option for casual games"
     }
   ];
+
+  const locations = ['all', 'Gulshan', 'Dhanmondi', 'Uttara', 'Mirpur'];
+  const priceRanges = [
+    { label: 'All Prices', value: 'all' },
+    { label: 'Under ৳2,000', value: 'under-2000' },
+    { label: '৳2,000 - ৳2,500', value: '2000-2500' },
+    { label: 'Above ৳2,500', value: 'above-2500' }
+  ];
+
+  const toggleFavorite = (turfId: number) => {
+    setFavorites(prev => 
+      prev.includes(turfId) 
+        ? prev.filter(id => id !== turfId)
+        : [...prev, turfId]
+    );
+  };
 
   const filteredTurfs = turfs.filter(turf => {
     const matchesSearch = turf.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          turf.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLocation = selectedLocation === 'all' || turf.location.includes(selectedLocation);
-    const matchesType = selectedType === 'all' || turf.type === selectedType;
     
-    return matchesSearch && matchesLocation && matchesType;
+    const matchesLocation = selectedLocation === 'all' || 
+                           turf.location.includes(selectedLocation);
+    
+    const matchesPrice = selectedPrice === 'all' ||
+                        (selectedPrice === 'under-2000' && turf.pricePerHour < 2000) ||
+                        (selectedPrice === '2000-2500' && turf.pricePerHour >= 2000 && turf.pricePerHour <= 2500) ||
+                        (selectedPrice === 'above-2500' && turf.pricePerHour > 2500);
+
+    return matchesSearch && matchesLocation && matchesPrice;
   });
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/')}
-                className="text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <h1 className="text-2xl font-bold text-stone-900">
-                Browse Turfs
-              </h1>
-            </div>
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-2xl px-6"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Book Now
-            </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50/30 via-white to-teal-50/30">
+      {/* Enhanced background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-emerald-200/20 to-teal-200/20 rounded-full opacity-60 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-blue-200/20 to-purple-200/20 rounded-full opacity-60 blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search & Filters */}
+      <EnhancedHeader />
+
+      <div className="container mx-auto px-4 py-8 relative">
+        {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="text-center mb-12"
         >
-          {/* Main Search */}
-          <div className="relative mb-6">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-stone-400" />
-            <Input
-              placeholder="Search turfs, location..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-4 py-4 bg-white border-stone-200 text-stone-900 placeholder:text-stone-500 rounded-2xl text-lg shadow-sm"
-            />
-          </div>
-
-          {/* Filter Pills */}
-          <div className="flex items-center space-x-3 mb-6 overflow-x-auto pb-2">
-            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
-                  <SelectItem value="all">All Areas</SelectItem>
-                  <SelectItem value="Dhanmondi">Dhanmondi</SelectItem>
-                  <SelectItem value="Gulshan">Gulshan</SelectItem>
-                  <SelectItem value="Banani">Banani</SelectItem>
-                  <SelectItem value="Uttara">Uttara</SelectItem>
-                  <SelectItem value="Mirpur">Mirpur</SelectItem>
-                  <SelectItem value="Wari">Wari</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="5v5">5v5</SelectItem>
-                  <SelectItem value="7v7">7v7</SelectItem>
-                  <SelectItem value="11v11">11v11</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-stone-200 shadow-sm">
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="border-0 bg-transparent rounded-2xl min-w-fit px-4 py-3">
-                  <SelectValue placeholder="Sort" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-stone-200 rounded-2xl shadow-lg">
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="distance">Nearest First</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              variant="outline"
-              className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl px-4 py-3 font-medium"
-            >
-              <SlidersHorizontal className="w-4 h-4 mr-2" />
-              More Filters
-            </Button>
-          </div>
-
-          {/* Results Count */}
-          <div className="flex items-center justify-between">
-            <p className="text-stone-600">
-              <span className="font-semibold text-stone-900">{filteredTurfs.length}</span> turfs found
-            </p>
-            <div className="flex items-center space-x-2">
-              <span className="text-stone-600 text-sm">View:</span>
-              <Button variant="ghost" size="sm" className="text-lime-600 bg-lime-50 rounded-xl">Grid</Button>
-              <Button variant="ghost" size="sm" className="text-stone-600 rounded-xl">List</Button>
-            </div>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            Find Your Perfect Turf ⚽
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Discover premium football turfs across Dhaka with world-class facilities
+          </p>
         </motion.div>
 
-        {/* Turf Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredTurfs.map((turf, index) => (
+        {/* Search and Filters */}
+        <Card className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl mb-8">
+          <CardContent className="p-8">
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Search */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search turfs by name or location..."
+                  className="pl-12 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm text-lg py-6"
+                />
+              </div>
+
+              {/* Location Filter */}
+              <div className="lg:w-48">
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="w-full p-4 rounded-2xl border border-white/30 bg-white/50 backdrop-blur-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  {locations.map(location => (
+                    <option key={location} value={location}>
+                      {location === 'all' ? 'All Locations' : location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price Filter */}
+              <div className="lg:w-48">
+                <select
+                  value={selectedPrice}
+                  onChange={(e) => setSelectedPrice(e.target.value)}
+                  className="w-full p-4 rounded-2xl border border-white/30 bg-white/50 backdrop-blur-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  {priceRanges.map(range => (
+                    <option key={range.value} value={range.value}>
+                      {range.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredTurfs.map((turf) => (
             <motion.div
               key={turf.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index }}
-              whileHover={{ y: -8 }}
-              className="group cursor-pointer"
-              onClick={() => navigate(`/turf/${turf.id}`)}
+              whileHover={{ y: -5 }}
+              className="group"
             >
-              <Card className="bg-white border border-stone-200 hover:shadow-2xl transition-all duration-300 overflow-hidden h-full rounded-3xl">
+              <Card className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden h-full">
                 <div className="relative">
                   <img
-                    src={turf.image}
+                    src={turf.images[0]}
                     alt={turf.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-56 object-cover"
                   />
-                  
-                  {/* Top Badges */}
-                  <div className="absolute top-4 left-4 space-y-2">
-                    <Badge className="bg-lime-100 text-lime-700 border-lime-200 rounded-full px-3 py-1 font-medium">
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleFavorite(turf.id)}
+                      className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/40"
+                    >
+                      <Heart className={`w-5 h-5 ${favorites.includes(turf.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+                    </Button>
+                    {!turf.available && (
+                      <Badge className="bg-red-500 text-white rounded-2xl px-3 py-1">
+                        Booked
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="absolute bottom-4 left-4">
+                    <Badge className="bg-emerald-500 text-white rounded-2xl px-3 py-1">
                       {turf.type}
                     </Badge>
-                    <Badge className="bg-blue-100 text-blue-700 border-blue-200 rounded-full px-3 py-1 font-medium">
-                      {turf.distance}
-                    </Badge>
-                  </div>
-                  
-                  {/* Price Badge */}
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-white/95 text-stone-900 rounded-full px-3 py-1 font-bold shadow-sm">
-                      ৳{turf.price}/hr
-                    </Badge>
-                  </div>
-
-                  {/* Bottom Info Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                          <span className="font-bold text-stone-900">{turf.rating}</span>
-                          <span className="text-stone-600 text-sm">({turf.reviews})</span>
-                        </div>
-                        <div className="flex items-center text-green-600 text-sm font-medium">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          <span>{turf.availableSlots} slots</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-stone-900 group-hover:text-lime-600 transition-colors text-xl">
-                    {turf.name}
-                  </CardTitle>
-                  <CardDescription className="flex items-center text-stone-600">
-                    <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span>{turf.location}</span>
-                  </CardDescription>
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-xl text-gray-800 group-hover:text-emerald-600 transition-colors">
+                        {turf.name}
+                      </CardTitle>
+                      <div className="flex items-center text-gray-600 mt-1">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span className="text-sm">{turf.location}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-emerald-600">
+                        ৳{turf.pricePerHour.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-500">per hour</div>
+                    </div>
+                  </div>
                 </CardHeader>
 
                 <CardContent className="pt-0">
-                  <div className="space-y-4">
-                    {/* Features */}
-                    <div className="flex flex-wrap gap-2">
-                      {turf.features.slice(0, 3).map((feature) => (
-                        <Badge 
-                          key={feature}
-                          variant="secondary"
-                          className="text-xs bg-stone-100 text-stone-700 border-stone-200 rounded-full px-3 py-1"
-                        >
-                          {feature}
-                        </Badge>
-                      ))}
-                    </div>
+                  <CardDescription className="text-gray-600 mb-4">
+                    {turf.description}
+                  </CardDescription>
 
-                    {/* Next Available & Book Button */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-stone-600 text-sm">
-                        <Clock className="w-4 h-4 mr-1" />
-                        <span>Next: {turf.nextAvailable}</span>
-                      </div>
-                      
-                      <Button
-                        size="sm"
-                        className="bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold rounded-xl px-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/turf/${turf.id}`);
-                        }}
-                      >
-                        Book Now
-                      </Button>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      <span className="ml-1 text-sm font-medium">{turf.rating}</span>
+                      <span className="text-sm text-gray-500 ml-1">({turf.reviews} reviews)</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Users className="w-4 h-4 mr-1" />
+                      <span>{turf.type}</span>
                     </div>
                   </div>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {turf.amenities.slice(0, 3).map((amenity) => (
+                      <Badge key={amenity} variant="outline" className="rounded-2xl text-xs">
+                        {amenity}
+                      </Badge>
+                    ))}
+                    {turf.amenities.length > 3 && (
+                      <Badge variant="outline" className="rounded-2xl text-xs">
+                        +{turf.amenities.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={() => navigate(`/turf/${turf.id}`)}
+                    disabled={!turf.available}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl py-3 shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                  >
+                    {turf.available ? (
+                      <>
+                        Book Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-4 h-4 mr-2" />
+                        Currently Booked
+                      </>
+                    )}
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        {/* No Results State */}
         {filteredTurfs.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <div className="w-24 h-24 mx-auto mb-6 bg-stone-100 rounded-full flex items-center justify-center">
-              <Search className="w-12 h-12 text-stone-400" />
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-gray-200 rounded-3xl mx-auto mb-6 flex items-center justify-center">
+              <Search className="w-12 h-12 text-gray-400" />
             </div>
-            <h3 className="text-2xl font-semibold text-stone-900 mb-3">No turfs found</h3>
-            <p className="text-stone-600 mb-8 max-w-md mx-auto">
-              Try adjusting your search criteria or browse all available turfs
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedLocation('all');
-                  setSelectedType('all');
-                }}
-                variant="outline"
-                className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl"
-              >
-                Clear Filters
-              </Button>
-              <Button
-                onClick={() => navigate('/')}
-                className="bg-lime-400 hover:bg-lime-500 text-stone-900 rounded-2xl"
-              >
-                Back to Home
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Load More */}
-        {filteredTurfs.length > 0 && (
-          <div className="text-center mt-12">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4">No turfs found</h3>
+            <p className="text-gray-600 mb-8">Try adjusting your search criteria</p>
             <Button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedLocation('all');
+                setSelectedPrice('all');
+              }}
               variant="outline"
-              className="border-stone-300 text-stone-700 hover:bg-stone-100 rounded-2xl px-8 py-3 font-semibold"
+              className="rounded-2xl border-emerald-200 text-emerald-600 hover:bg-emerald-50"
             >
-              Load More Turfs
+              Clear Filters
             </Button>
           </div>
         )}
