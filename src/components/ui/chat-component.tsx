@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Send, Phone, Video, MoreVertical } from 'lucide-react';
+import { X, Send, Phone, Video, MoreVertical, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
