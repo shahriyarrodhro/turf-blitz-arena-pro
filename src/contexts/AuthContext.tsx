@@ -7,93 +7,129 @@ interface User {
   name: string;
   role: 'player' | 'turf-owner' | 'admin';
   avatar?: string;
+  phone?: string;
+  location?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
   isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: Omit<User, 'id'> & { password: string }) => Promise<void>;
+  logout: () => void;
+  updateProfile: (data: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+// Mock users database
+const mockUsers: (User & { password: string })[] = [
+  {
+    id: '1',
+    email: 'player@example.com',
+    name: 'Ahmed Rahman',
+    role: 'player',
+    password: 'password123',
+    phone: '+880 1712-345678',
+    location: 'Dhaka'
+  },
+  {
+    id: '2',
+    email: 'owner@example.com',
+    name: 'Champions Sports',
+    role: 'turf-owner',
+    password: 'password123',
+    phone: '+880 1798-765432',
+    location: 'Gulshan'
+  },
+  {
+    id: '3',
+    email: 'admin@example.com',
+    name: 'System Admin',
+    role: 'admin',
+    password: 'password123',
+    phone: '+880 1555-123456',
+    location: 'Dhaka'
   }
-  return context;
-};
+];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Demo users
-  const demoUsers = [
-    { id: '1', email: 'player@example.com', password: 'player123', name: 'Ahmed Rahman', role: 'player' as const },
-    { id: '2', email: 'turf@example.com', password: 'turf123', name: 'Champions Sports', role: 'turf-owner' as const },
-    { id: '3', email: 'admin@example.com', password: 'admin123', name: 'System Admin', role: 'admin' as const },
-  ];
-
   useEffect(() => {
-    // Check for existing session with more robust validation
-    const checkAuth = () => {
-      try {
-        const savedUser = localStorage.getItem('turfx_user');
-        const sessionExpiry = localStorage.getItem('turfx_session_expiry');
-        
-        if (savedUser && sessionExpiry) {
-          const expiryTime = parseInt(sessionExpiry);
-          const currentTime = Date.now();
-          
-          // Check if session is still valid (24 hours)
-          if (currentTime < expiryTime) {
-            const parsedUser = JSON.parse(savedUser);
-            setUser(parsedUser);
-          } else {
-            // Session expired, clear storage
-            localStorage.removeItem('turfx_user');
-            localStorage.removeItem('turfx_session_expiry');
-          }
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error);
+    // Check for stored session
+    const storedUser = localStorage.getItem('turfx_user');
+    const sessionExpiry = localStorage.getItem('turfx_session_expiry');
+    
+    if (storedUser && sessionExpiry) {
+      const now = new Date().getTime();
+      const expiry = parseInt(sessionExpiry);
+      
+      if (now < expiry) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        // Session expired
         localStorage.removeItem('turfx_user');
         localStorage.removeItem('turfx_session_expiry');
       }
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundUser = demoUsers.find(u => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      
-      // Set session expiry to 24 hours from now
-      const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
-      
-      setUser(userWithoutPassword);
-      localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('turfx_session_expiry', expiryTime.toString());
-      setIsLoading(false);
-      return true;
     }
     
     setIsLoading(false);
-    return false;
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const foundUser = mockUsers.find(u => u.email === email && u.password === password);
+    
+    if (foundUser) {
+      const { password: _, ...userWithoutPassword } = foundUser;
+      setUser(userWithoutPassword);
+      
+      // Set session with 24 hour expiry
+      const expiry = new Date().getTime() + (24 * 60 * 60 * 1000);
+      localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
+      localStorage.setItem('turfx_session_expiry', expiry.toString());
+    } else {
+      throw new Error('Invalid credentials');
+    }
+    
+    setIsLoading(false);
+  };
+
+  const register = async (userData: Omit<User, 'id'> & { password: string }) => {
+    setIsLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check if user already exists
+    const existingUser = mockUsers.find(u => u.email === userData.email);
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+    
+    const newUser = {
+      ...userData,
+      id: Date.now().toString()
+    };
+    
+    mockUsers.push(newUser);
+    
+    const { password: _, ...userWithoutPassword } = newUser;
+    setUser(userWithoutPassword);
+    
+    // Set session with 24 hour expiry
+    const expiry = new Date().getTime() + (24 * 60 * 60 * 1000);
+    localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
+    localStorage.setItem('turfx_session_expiry', expiry.toString());
+    
+    setIsLoading(false);
   };
 
   const logout = () => {
@@ -102,22 +138,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('turfx_session_expiry');
   };
 
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-      localStorage.setItem('turfx_user', JSON.stringify(updatedUser));
-    }
+  const updateProfile = async (data: Partial<User>) => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const updatedUser = { ...user, ...data };
+    setUser(updatedUser);
+    
+    // Update stored session
+    localStorage.setItem('turfx_user', JSON.stringify(updatedUser));
+    
+    setIsLoading(false);
   };
 
   const value = {
     user,
-    login,
-    logout,
-    updateUser,
     isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+    updateProfile,
     isLoading
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

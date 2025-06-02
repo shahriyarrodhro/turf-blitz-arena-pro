@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { X, User, Bell, Shield, Palette, Globe, Save } from 'lucide-react';
+import { X, User, Bell, Shield, Palette, Globe, Save, Camera, Mail, Phone, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -15,310 +15,400 @@ interface SettingsProps {
   onClose: () => void;
 }
 
-interface NotificationSettings {
-  email: boolean;
-  push: boolean;
-  sms: boolean;
-}
-
-interface PrivacySettings {
-  profilePublic: boolean;
-  showOnlineStatus: boolean;
-}
-
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  bio: string;
-  notifications: NotificationSettings;
-  privacy: PrivacySettings;
-  theme: string;
-}
-
 export const SettingsComponent = ({ isOpen, onClose }: SettingsProps) => {
-  const { user, updateUser } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
+  const { user, updateProfile } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
   
-  // Form state
-  const [formData, setFormData] = useState<FormData>({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: '',
-    bio: '',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    },
-    privacy: {
-      profilePublic: true,
-      showOnlineStatus: true
-    },
-    theme: 'light'
-  });
+  // Profile settings
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [location, setLocation] = useState(user?.location || '');
+  
+  // Notification settings
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [matchUpdates, setMatchUpdates] = useState(true);
+  const [teamInvites, setTeamInvites] = useState(true);
+  const [tournamentNews, setTournamentNews] = useState(true);
+  
+  // Privacy settings
+  const [profileVisibility, setProfileVisibility] = useState('public');
+  const [showEmail, setShowEmail] = useState(false);
+  const [showPhone, setShowPhone] = useState(false);
+  const [allowInvites, setAllowInvites] = useState(true);
+  
+  // Appearance settings
+  const [theme, setTheme] = useState('light');
+  const [language, setLanguage] = useState('english');
 
-  const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  const bangladeshCities = [
+    'Dhaka', 'Chittagong', 'Sylhet', 'Rajshahi', 'Khulna', 'Barisal', 'Rangpur', 'Mymensingh',
+    'Comilla', 'Narayanganj', 'Gazipur', 'Tongi', 'Bogra', 'Jessore'
+  ];
 
-  const handleNestedChange = (category: 'notifications' | 'privacy', field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [field]: value
-      }
-    }));
-  };
-
-  const handleSave = async () => {
-    setIsSaving(true);
+  const handleSaveProfile = async () => {
+    if (!user) return;
     
+    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update user context
-      updateUser({
-        name: formData.name,
-        email: formData.email
+      await updateProfile({
+        name,
+        email,
+        phone,
+        location
       });
-      
-      // Save to localStorage (in real app, this would be API call)
-      localStorage.setItem('turfx_settings', JSON.stringify(formData));
       
       toast({
-        title: "Settings Saved",
-        description: "Your settings have been updated successfully",
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated",
       });
-      
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save settings. Please try again.",
+        description: "Failed to update profile",
         variant: "destructive"
       });
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
+  };
+
+  const handleSaveNotifications = () => {
+    // Save notification preferences (mock implementation)
+    toast({
+      title: "Notification Settings Saved",
+      description: "Your notification preferences have been updated",
+    });
+  };
+
+  const handleSavePrivacy = () => {
+    // Save privacy settings (mock implementation)
+    toast({
+      title: "Privacy Settings Saved",
+      description: "Your privacy preferences have been updated",
+    });
+  };
+
+  const handleSaveAppearance = () => {
+    // Save appearance settings (mock implementation)
+    toast({
+      title: "Appearance Settings Saved",
+      description: "Your appearance preferences have been updated",
+    });
   };
 
   if (!isOpen) return null;
 
+  const tabs = [
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'privacy', label: 'Privacy', icon: Shield },
+    { id: 'appearance', label: 'Appearance', icon: Palette }
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <Card className="w-full max-w-4xl h-[80vh] bg-white/95 backdrop-blur-md border-gray-200/50 mx-4 overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between p-6 border-b border-gray-200/50 bg-gradient-to-r from-white/60 to-gray-50/60">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl h-[90vh] bg-white/95 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between p-6 border-b border-white/30 bg-gradient-to-r from-white/50 to-white/30">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-800">Settings</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Settings</h3>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-2xl hover:bg-red-50/80 hover:text-red-600 transition-all duration-300">
             <X className="w-5 h-5" />
           </Button>
         </CardHeader>
-
-        <CardContent className="p-0 h-[calc(100%-80px)] overflow-y-auto">
-          <Tabs defaultValue="profile" className="h-full">
-            <TabsList className="grid w-full grid-cols-4 bg-gray-100/50 rounded-none">
-              <TabsTrigger value="profile" className="data-[state=active]:bg-white">Profile</TabsTrigger>
-              <TabsTrigger value="notifications" className="data-[state=active]:bg-white">Notifications</TabsTrigger>
-              <TabsTrigger value="privacy" className="data-[state=active]:bg-white">Privacy</TabsTrigger>
-              <TabsTrigger value="appearance" className="data-[state=active]:bg-white">Appearance</TabsTrigger>
-            </TabsList>
-
-            <div className="p-6">
-              <TabsContent value="profile" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Profile Information</h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="rounded-xl border-gray-200 bg-white/60"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="rounded-xl border-gray-200 bg-white/60"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="+880 1XXX-XXXXXX"
-                      className="rounded-xl border-gray-200 bg-white/60"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="bio">Bio</Label>
-                    <textarea
-                      id="bio"
-                      rows={3}
-                      value={formData.bio}
-                      onChange={(e) => handleInputChange('bio', e.target.value)}
-                      placeholder="Tell us about yourself..."
-                      className="w-full p-3 border border-gray-200 rounded-xl bg-white/60 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="notifications" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Notification Preferences</h4>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Bell className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">Email Notifications</div>
-                          <div className="text-sm text-gray-500">Receive notifications via email</div>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.email}
-                        onCheckedChange={(checked) => handleNestedChange('notifications', 'email', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Bell className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">Push Notifications</div>
-                          <div className="text-sm text-gray-500">Receive push notifications</div>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.push}
-                        onCheckedChange={(checked) => handleNestedChange('notifications', 'push', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Bell className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">SMS Notifications</div>
-                          <div className="text-sm text-gray-500">Receive notifications via SMS</div>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={formData.notifications.sms}
-                        onCheckedChange={(checked) => handleNestedChange('notifications', 'sms', checked)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="privacy" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Privacy Settings</h4>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <User className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">Public Profile</div>
-                          <div className="text-sm text-gray-500">Make your profile visible to others</div>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={formData.privacy.profilePublic}
-                        onCheckedChange={(checked) => handleNestedChange('privacy', 'profilePublic', checked)}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 bg-white/60 rounded-xl border border-gray-200">
-                      <div className="flex items-center space-x-3">
-                        <Globe className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <div className="font-medium">Show Online Status</div>
-                          <div className="text-sm text-gray-500">Let others see when you're online</div>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={formData.privacy.showOnlineStatus}
-                        onCheckedChange={(checked) => handleNestedChange('privacy', 'showOnlineStatus', checked)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="appearance" className="space-y-6 mt-0">
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Appearance</h4>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Theme</Label>
-                      <div className="grid grid-cols-3 gap-3 mt-2">
-                        {['light', 'dark', 'auto'].map((theme) => (
-                          <Button
-                            key={theme}
-                            variant={formData.theme === theme ? "default" : "outline"}
-                            onClick={() => handleInputChange('theme', theme)}
-                            className="capitalize rounded-xl"
-                          >
-                            <Palette className="w-4 h-4 mr-2" />
-                            {theme}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              {/* Save Button */}
-              <div className="sticky bottom-0 bg-white/80 backdrop-blur-sm border-t border-gray-200/50 p-4 mt-8">
+        
+        <div className="flex h-[calc(100%-100px)]">
+          {/* Sidebar */}
+          <div className="w-1/3 border-r border-white/30 bg-gradient-to-b from-white/40 to-white/20 p-4">
+            <nav className="space-y-2">
+              {tabs.map((tab) => (
                 <Button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl py-3 shadow-lg transition-all duration-300"
+                  key={tab.id}
+                  variant="ghost"
+                  className={`w-full justify-start rounded-2xl transition-all duration-300 ${
+                    activeTab === tab.id 
+                      ? 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 text-blue-700 shadow-lg' 
+                      : 'text-gray-700 hover:bg-white/40'
+                  }`}
+                  onClick={() => setActiveTab(tab.id)}
                 >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Changes
-                    </>
-                  )}
+                  <tab.icon className="w-5 h-5 mr-3" />
+                  {tab.label}
+                </Button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6 overflow-y-auto bg-gradient-to-b from-gray-50/30 to-white/20">
+            {activeTab === 'profile' && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <div className="relative inline-block">
+                    <Avatar className="w-24 h-24 shadow-2xl">
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-2xl font-bold">
+                        {user?.name?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Button size="icon" className="absolute -bottom-2 -right-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
+                      <Camera className="w-4 h-4 text-white" />
+                    </Button>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-800 mt-3">{user?.name}</h4>
+                  <p className="text-gray-600 capitalize">{user?.role?.replace('-', ' ')}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="pl-10 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm"
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email"
+                        className="pl-10 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm"
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="pl-10 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm"
+                        placeholder="+880 1XXX-XXXXXX"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Select value={location} onValueChange={setLocation}>
+                        <SelectTrigger className="pl-10 rounded-2xl border-white/30 bg-white/50">
+                          <SelectValue placeholder="Select your city" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {bangladeshCities.map(city => (
+                            <SelectItem key={city} value={city}>{city}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleSaveProfile}
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-2xl py-3 shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {isLoading ? 'Saving...' : 'Save Profile'}
                 </Button>
               </div>
-            </div>
-          </Tabs>
-        </CardContent>
+            )}
+
+            {activeTab === 'notifications' && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-800">Notification Channels</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Email Notifications</h5>
+                        <p className="text-sm text-gray-600">Receive notifications via email</p>
+                      </div>
+                      <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Push Notifications</h5>
+                        <p className="text-sm text-gray-600">Receive push notifications in browser</p>
+                      </div>
+                      <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">SMS Notifications</h5>
+                        <p className="text-sm text-gray-600">Receive important updates via SMS</p>
+                      </div>
+                      <Switch checked={smsNotifications} onCheckedChange={setSmsNotifications} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-800">Notification Types</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Match Updates</h5>
+                        <p className="text-sm text-gray-600">Get notified about match schedules and results</p>
+                      </div>
+                      <Switch checked={matchUpdates} onCheckedChange={setMatchUpdates} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Team Invites</h5>
+                        <p className="text-sm text-gray-600">Receive team invitation notifications</p>
+                      </div>
+                      <Switch checked={teamInvites} onCheckedChange={setTeamInvites} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Tournament News</h5>
+                        <p className="text-sm text-gray-600">Stay updated with tournament announcements</p>
+                      </div>
+                      <Switch checked={tournamentNews} onCheckedChange={setTournamentNews} />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleSaveNotifications}
+                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-2xl py-3 shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Notification Settings
+                </Button>
+              </div>
+            )}
+
+            {activeTab === 'privacy' && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-800">Profile Visibility</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Who can see your profile?</label>
+                      <Select value={profileVisibility} onValueChange={setProfileVisibility}>
+                        <SelectTrigger className="rounded-2xl border-white/30 bg-white/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="public">Everyone</SelectItem>
+                          <SelectItem value="friends">Friends Only</SelectItem>
+                          <SelectItem value="private">Private</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Show Email</h5>
+                        <p className="text-sm text-gray-600">Allow others to see your email address</p>
+                      </div>
+                      <Switch checked={showEmail} onCheckedChange={setShowEmail} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Show Phone</h5>
+                        <p className="text-sm text-gray-600">Allow others to see your phone number</p>
+                      </div>
+                      <Switch checked={showPhone} onCheckedChange={setShowPhone} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <div>
+                        <h5 className="font-medium text-gray-800">Allow Invites</h5>
+                        <p className="text-sm text-gray-600">Allow others to invite you to teams and matches</p>
+                      </div>
+                      <Switch checked={allowInvites} onCheckedChange={setAllowInvites} />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleSavePrivacy}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-2xl py-3 shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Privacy Settings
+                </Button>
+              </div>
+            )}
+
+            {activeTab === 'appearance' && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-800">Theme & Language</h4>
+                  
+                  <div className="space-y-4">
+                    <div className="p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+                      <Select value={theme} onValueChange={setTheme}>
+                        <SelectTrigger className="rounded-2xl border-white/30 bg-white/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="light">Light Mode</SelectItem>
+                          <SelectItem value="dark">Dark Mode</SelectItem>
+                          <SelectItem value="auto">Auto (System)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="p-4 bg-white/50 rounded-2xl border border-white/20">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+                      <Select value={language} onValueChange={setLanguage}>
+                        <SelectTrigger className="rounded-2xl border-white/30 bg-white/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="english">English</SelectItem>
+                          <SelectItem value="bangla">বাংলা (Bangla)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleSaveAppearance}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-2xl py-3 shadow-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Appearance Settings
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       </Card>
     </div>
   );
