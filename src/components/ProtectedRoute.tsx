@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -16,24 +16,31 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo = '/auth' 
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-lime-500 mx-auto mb-4" />
-          <p className="text-stone-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 via-white to-gray-50">
+        <div className="text-center backdrop-blur-sm bg-white/60 p-8 rounded-3xl border border-white/20 shadow-xl">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+  if (!isAuthenticated || !user) {
+    return <Navigate to={`${redirectTo}?returnTo=${location.pathname}`} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/auth" replace />;
+    // Redirect to appropriate dashboard based on user role
+    const dashboardRoutes = {
+      'player': '/player',
+      'turf-owner': '/turf-owner',
+      'admin': '/admin'
+    };
+    return <Navigate to={dashboardRoutes[user.role]} replace />;
   }
 
   return <>{children}</>;

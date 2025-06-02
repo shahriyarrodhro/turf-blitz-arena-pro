@@ -1,93 +1,65 @@
-
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, Users, MapPin, Star, Shield, Wifi, Car, Camera, Heart } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, Users, Clock, Wifi, Car, ShowerHead, Calendar, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Header } from '@/components/ui/header';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/contexts/BookingContext';
 import { toast } from '@/hooks/use-toast';
 
 const TurfBooking = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { createBooking } = useBooking();
+  
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedSlot, setSelectedSlot] = useState('');
-  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [duration, setDuration] = useState(1);
+  const [teamName, setTeamName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
+  const [specialRequests, setSpecialRequests] = useState('');
   const [isBooking, setIsBooking] = useState(false);
 
   const turf = {
-    id: 1,
-    name: "Champions Arena",
-    location: "Dhanmondi, Dhaka",
-    type: "7v7",
+    id: id || '1',
+    name: 'Champions Arena',
+    location: 'Gulshan 2, Dhaka',
     rating: 4.8,
     reviews: 124,
     price: 2500,
-    image: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-    images: [
-      "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      "https://images.unsplash.com/photo-1426604966848-d7adac402bff"
-    ],
-    features: ["Floodlights", "Parking", "Changing Room", "WiFi", "Security", "First Aid"],
-    description: "Premium synthetic turf with professional-grade facilities. Perfect for competitive matches and training sessions.",
-    rules: [
-      "No outside food or drinks",
-      "Sports shoes mandatory",
-      "Maximum 14 players",
-      "No smoking on premises"
-    ]
+    images: ['/placeholder.svg'],
+    amenities: ['WiFi', 'Parking', 'Changing Room', 'Flood Lights'],
+    description: 'Premium football turf with state-of-the-art facilities...',
+    owner: 'Champions Sports Complex',
+    contact: '+880 1711-123456'
   };
 
-  const timeSlots = [
-    { time: "06:00", available: true, prime: false },
-    { time: "08:00", available: true, prime: false },
-    { time: "10:00", available: false, prime: false },
-    { time: "12:00", available: true, prime: false },
-    { time: "14:00", available: true, prime: false },
-    { time: "16:00", available: true, prime: true },
-    { time: "18:00", available: true, prime: true },
-    { time: "20:00", available: false, prime: true },
-    { time: "22:00", available: true, prime: true }
+  const availableSlots = [
+    '06:00', '07:00', '08:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
   ];
 
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() + i);
-    return {
-      date: date.toISOString().split('T')[0],
-      day: date.toLocaleDateString('en', { weekday: 'short' }),
-      dayNumber: date.getDate()
-    };
-  });
-
-  const calculateTotal = () => {
-    if (!selectedSlot) return 0;
-    const slot = timeSlots.find(s => s.time === selectedSlot);
-    const basePrice = slot?.prime ? turf.price * 1.5 : turf.price;
-    return basePrice * selectedDuration;
-  };
-
   const handleBooking = async () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
-        description: "Please login to book a turf",
+        description: "Please log in to make a booking",
         variant: "destructive"
       });
-      navigate('/auth');
+      navigate('/auth?returnTo=' + encodeURIComponent(window.location.pathname));
       return;
     }
 
-    if (!selectedDate || !selectedSlot) {
+    if (!selectedDate || !selectedTime || !teamName || !contactNumber) {
       toast({
-        title: "Incomplete Selection",
-        description: "Please select both date and time slot",
+        title: "Missing Information",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
@@ -96,28 +68,33 @@ const TurfBooking = () => {
     setIsBooking(true);
 
     try {
-      // Simulate booking process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       const bookingId = createBooking({
-        turfId: turf.id.toString(),
+        turfId: turf.id,
         turfName: turf.name,
         date: selectedDate,
-        time: selectedSlot,
-        duration: selectedDuration,
-        playerName: user?.name || '',
-        playerEmail: user?.email || '',
-        totalAmount: calculateTotal(),
+        time: selectedTime,
+        duration,
+        playerName: user.name,
+        playerEmail: user.email,
+        totalAmount: turf.price * duration,
         status: 'confirmed'
       });
 
       toast({
         title: "Booking Confirmed!",
-        description: `Your booking ${bookingId} has been confirmed for ${selectedDate} at ${selectedSlot}`,
+        description: `Your booking has been confirmed. Booking ID: ${bookingId}`,
       });
 
-      // Redirect to player dashboard
-      navigate('/player?tab=bookings');
+      // Reset form
+      setSelectedDate('');
+      setSelectedTime('');
+      setTeamName('');
+      setContactNumber('');
+      setSpecialRequests('');
+
     } catch (error) {
       toast({
         title: "Booking Failed",
@@ -130,262 +107,217 @@ const TurfBooking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/turfs')}
-              className="text-stone-600 hover:text-stone-900 p-2 rounded-2xl"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back
-            </Button>
-            <h1 className="text-xl font-bold text-stone-900">
-              Book Turf
-            </h1>
-            <Button
-              variant="ghost"
-              className="text-stone-600 hover:text-red-500 p-2 rounded-2xl"
-            >
-              <Heart className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <Header />
+      
+      <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/turfs')}
+          className="mb-6 backdrop-blur-sm bg-white/60 hover:bg-white/80 rounded-xl border border-white/20 transition-all duration-300"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Turfs
+        </Button>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Turf Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Turf Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                  <img
-                    src={turf.images[0]}
-                    alt={turf.name}
-                    className="w-full h-64 md:h-80 object-cover rounded-3xl"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-lime-100 text-lime-700 border-lime-200 rounded-full px-3 py-1">
-                    {turf.type}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {turf.images.slice(1).map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={img}
-                      alt={`${turf.name} ${idx + 2}`}
-                      className="w-full h-[152px] md:h-[152px] object-cover rounded-3xl"
-                    />
-                  ))}
-                  <div className="relative bg-stone-100 rounded-3xl flex items-center justify-center border border-stone-200">
-                    <div className="text-center">
-                      <Camera className="w-6 h-6 text-stone-600 mx-auto mb-2" />
-                      <span className="text-stone-600 text-sm font-medium">+5 more</span>
-                    </div>
-                  </div>
-                </div>
+            <Card className="backdrop-blur-sm bg-white/60 border border-white/20 rounded-3xl overflow-hidden shadow-xl">
+              <div className="aspect-video bg-gradient-to-r from-emerald-100 to-teal-100 flex items-center justify-center">
+                <img 
+                  src={turf.images[0]} 
+                  alt={turf.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            </motion.div>
+            </Card>
 
             {/* Turf Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Card className="bg-white border border-stone-200 rounded-3xl shadow-sm">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-2xl text-stone-900 mb-2">{turf.name}</CardTitle>
-                      <div className="flex items-center space-x-4 text-stone-600">
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          {turf.location}
-                        </div>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1 text-yellow-500 fill-current" />
-                          {turf.rating} ({turf.reviews} reviews)
-                        </div>
+            <Card className="backdrop-blur-sm bg-white/60 border border-white/20 rounded-3xl shadow-xl">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-bold text-gray-800">{turf.name}</CardTitle>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <div className="flex items-center text-gray-600">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span className="text-sm">{turf.location}</span>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-stone-900">৳{turf.price}</div>
-                      <div className="text-sm text-stone-600">per hour</div>
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
+                        <span className="text-sm font-medium">{turf.rating}</span>
+                        <span className="text-sm text-gray-500 ml-1">({turf.reviews} reviews)</span>
+                      </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-stone-600 mb-6">{turf.description}</p>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    {turf.features.map((feature) => (
-                      <div key={feature} className="flex items-center space-x-2 text-stone-700">
-                        <div className="w-2 h-2 bg-lime-400 rounded-full"></div>
-                        <span className="text-sm">{feature}</span>
-                      </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-emerald-600">৳{turf.price}</div>
+                    <div className="text-sm text-gray-500">per hour</div>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Amenities</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {turf.amenities.map((amenity, index) => (
+                      <Badge key={index} className="bg-emerald-100 text-emerald-700 border border-emerald-200">
+                        {amenity}
+                      </Badge>
                     ))}
                   </div>
-
-                  <div className="border-t border-stone-200 pt-6">
-                    <h4 className="text-stone-900 font-semibold mb-3">Rules & Guidelines</h4>
-                    <ul className="space-y-2">
-                      {turf.rules.map((rule, idx) => (
-                        <li key={idx} className="flex items-center space-x-2 text-stone-600 text-sm">
-                          <Shield className="w-3 h-3 text-lime-600" />
-                          <span>{rule}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Description</h3>
+                  <p className="text-gray-600">{turf.description}</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Right Column - Booking Form */}
+          {/* Booking Form */}
           <div className="space-y-6">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="bg-white border border-stone-200 rounded-3xl shadow-sm sticky top-24">
-                <CardHeader>
-                  <CardTitle className="text-stone-900">Reserve Your Slot</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {!isAuthenticated && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
-                      <p className="text-yellow-800 text-sm">
-                        Please login to make a booking
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Date Selection */}
+            <Card className="backdrop-blur-sm bg-white/60 border border-white/20 rounded-3xl shadow-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-gray-800">
+                  <Calendar className="w-5 h-5 mr-2 text-emerald-600" />
+                  Book This Turf
+                </CardTitle>
+                <CardDescription>
+                  Fill in the details to confirm your booking
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-stone-900 font-medium mb-3">Select Date</label>
-                    <div className="grid grid-cols-7 gap-2">
-                      {dates.map((date) => (
-                        <button
-                          key={date.date}
-                          onClick={() => setSelectedDate(date.date)}
-                          className={`p-3 rounded-2xl text-center transition-all ${
-                            selectedDate === date.date
-                              ? 'bg-lime-400 text-stone-900'
-                              : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-                          }`}
-                        >
-                          <div className="text-xs font-medium">{date.day}</div>
-                          <div className="text-lg font-bold">{date.dayNumber}</div>
-                        </button>
-                      ))}
+                    <Label htmlFor="date">Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="rounded-xl border-white/30 bg-white/20 focus:bg-white/40"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="duration">Duration (hours)</Label>
+                    <Input
+                      id="duration"
+                      type="number"
+                      min="1"
+                      max="4"
+                      value={duration}
+                      onChange={(e) => setDuration(parseInt(e.target.value) || 1)}
+                      className="rounded-xl border-white/30 bg-white/20 focus:bg-white/40"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Available Time Slots</Label>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {availableSlots.map((slot) => (
+                      <Button
+                        key={slot}
+                        variant={selectedTime === slot ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedTime(slot)}
+                        className={`rounded-xl transition-all duration-300 ${
+                          selectedTime === slot 
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white' 
+                            : 'border-white/30 bg-white/20 hover:bg-white/40'
+                        }`}
+                      >
+                        {slot}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="teamName">Team Name</Label>
+                  <Input
+                    id="teamName"
+                    placeholder="Enter your team name"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                    className="rounded-xl border-white/30 bg-white/20 focus:bg-white/40"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="contact">Contact Number</Label>
+                  <Input
+                    id="contact"
+                    placeholder="+880 1XXX-XXXXXX"
+                    value={contactNumber}
+                    onChange={(e) => setContactNumber(e.target.value)}
+                    className="rounded-xl border-white/30 bg-white/20 focus:bg-white/40"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="requests">Special Requests (Optional)</Label>
+                  <Textarea
+                    id="requests"
+                    placeholder="Any special requirements..."
+                    value={specialRequests}
+                    onChange={(e) => setSpecialRequests(e.target.value)}
+                    className="rounded-xl border-white/30 bg-white/20 focus:bg-white/40"
+                  />
+                </div>
+
+                {/* Booking Summary */}
+                {selectedDate && selectedTime && (
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-200">
+                    <h4 className="font-semibold text-gray-800 mb-2">Booking Summary</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>Date:</span>
+                        <span className="font-medium">{selectedDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Time:</span>
+                        <span className="font-medium">{selectedTime}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Duration:</span>
+                        <span className="font-medium">{duration} hour(s)</span>
+                      </div>
+                      <div className="flex justify-between border-t border-emerald-200 pt-2 mt-2">
+                        <span className="font-semibold">Total:</span>
+                        <span className="font-bold text-emerald-600">৳{turf.price * duration}</span>
+                      </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Time Slots */}
-                  {selectedDate && (
-                    <div>
-                      <label className="block text-stone-900 font-medium mb-3">Available Time Slots</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {timeSlots.map((slot) => (
-                          <button
-                            key={slot.time}
-                            disabled={!slot.available}
-                            onClick={() => setSelectedSlot(slot.time)}
-                            className={`p-3 rounded-2xl text-center transition-all relative ${
-                              selectedSlot === slot.time
-                                ? 'bg-lime-400 text-stone-900'
-                                : slot.available
-                                ? 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-                                : 'bg-stone-50 text-stone-400 cursor-not-allowed'
-                            }`}
-                          >
-                            <div className="font-medium">{slot.time}</div>
-                            {slot.prime && (
-                              <Badge className="absolute -top-1 -right-1 bg-yellow-100 text-yellow-700 border-yellow-200 text-xs rounded-full">
-                                Prime
-                              </Badge>
-                            )}
-                            {!slot.available && (
-                              <div className="text-xs text-red-500">Booked</div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                <Button
+                  onClick={handleBooking}
+                  disabled={isBooking || !selectedDate || !selectedTime || !teamName || !contactNumber}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl py-3 shadow-lg transition-all duration-300"
+                >
+                  {isBooking ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Confirm Booking
+                    </>
                   )}
-
-                  {/* Duration */}
-                  {selectedSlot && (
-                    <div>
-                      <label className="block text-stone-900 font-medium mb-3">Duration (hours)</label>
-                      <div className="flex items-center justify-center space-x-4 bg-stone-100 rounded-2xl p-4">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedDuration(Math.max(1, selectedDuration - 1))}
-                          className="border-stone-300 text-stone-700 rounded-xl"
-                        >
-                          -
-                        </Button>
-                        <span className="text-stone-900 font-bold text-lg px-4">{selectedDuration}</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedDuration(Math.min(4, selectedDuration + 1))}
-                          className="border-stone-300 text-stone-700 rounded-xl"
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Summary */}
-                  {selectedSlot && (
-                    <div className="border-t border-stone-200 pt-6">
-                      <div className="space-y-3 mb-6">
-                        <div className="flex justify-between text-stone-600">
-                          <span>Base Price ({selectedDuration}h)</span>
-                          <span>৳{turf.price * selectedDuration}</span>
-                        </div>
-                        {timeSlots.find(s => s.time === selectedSlot)?.prime && (
-                          <div className="flex justify-between text-stone-600">
-                            <span>Prime Time (50%)</span>
-                            <span>৳{(turf.price * selectedDuration * 0.5)}</span>
-                          </div>
-                        )}
-                        <div className="border-t border-stone-200 pt-3">
-                          <div className="flex justify-between text-stone-900 font-bold text-lg">
-                            <span>Total</span>
-                            <span className="text-lime-600">৳{calculateTotal()}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Button
-                        onClick={handleBooking}
-                        disabled={isBooking || !isAuthenticated}
-                        className="w-full bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold py-4 rounded-2xl"
-                      >
-                        {isBooking ? 'Processing...' : isAuthenticated ? 'Reserve Now' : 'Login to Book'}
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
