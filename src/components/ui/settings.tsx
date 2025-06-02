@@ -15,12 +15,33 @@ interface SettingsProps {
   onClose: () => void;
 }
 
+interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+}
+
+interface PrivacySettings {
+  profilePublic: boolean;
+  showOnlineStatus: boolean;
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  bio: string;
+  notifications: NotificationSettings;
+  privacy: PrivacySettings;
+  theme: string;
+}
+
 export const SettingsComponent = ({ isOpen, onClose }: SettingsProps) => {
   const { user, updateUser } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: user?.name || '',
     email: user?.email || '',
     phone: '',
@@ -37,18 +58,18 @@ export const SettingsComponent = ({ isOpen, onClose }: SettingsProps) => {
     theme: 'light'
   });
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleNestedChange = (category: string, field: string, value: any) => {
+  const handleNestedChange = (category: 'notifications' | 'privacy', field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [category]: {
-        ...prev[category as keyof typeof prev],
+        ...prev[category],
         [field]: value
       }
     }));
