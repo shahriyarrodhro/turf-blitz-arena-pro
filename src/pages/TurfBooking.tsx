@@ -6,13 +6,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useBooking } from '@/contexts/BookingContext';
+import { toast } from '@/hooks/use-toast';
 
 const TurfBooking = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user, isAuthenticated } = useAuth();
+  const { createBooking } = useBooking();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlot, setSelectedSlot] = useState('');
   const [selectedDuration, setSelectedDuration] = useState(1);
+  const [isBooking, setIsBooking] = useState(false);
 
   const turf = {
     id: 1,
@@ -65,6 +71,62 @@ const TurfBooking = () => {
     const slot = timeSlots.find(s => s.time === selectedSlot);
     const basePrice = slot?.prime ? turf.price * 1.5 : turf.price;
     return basePrice * selectedDuration;
+  };
+
+  const handleBooking = async () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login to book a turf",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
+    if (!selectedDate || !selectedSlot) {
+      toast({
+        title: "Incomplete Selection",
+        description: "Please select both date and time slot",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsBooking(true);
+
+    try {
+      // Simulate booking process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const bookingId = createBooking({
+        turfId: turf.id.toString(),
+        turfName: turf.name,
+        date: selectedDate,
+        time: selectedSlot,
+        duration: selectedDuration,
+        playerName: user?.name || '',
+        playerEmail: user?.email || '',
+        totalAmount: calculateTotal(),
+        status: 'confirmed'
+      });
+
+      toast({
+        title: "Booking Confirmed!",
+        description: `Your booking ${bookingId} has been confirmed for ${selectedDate} at ${selectedSlot}`,
+      });
+
+      // Redirect to player dashboard
+      navigate('/player?tab=bookings');
+    } catch (error) {
+      toast({
+        title: "Booking Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   return (
@@ -202,6 +264,14 @@ const TurfBooking = () => {
                   <CardTitle className="text-stone-900">Reserve Your Slot</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {!isAuthenticated && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
+                      <p className="text-yellow-800 text-sm">
+                        Please login to make a booking
+                      </p>
+                    </div>
+                  )}
+
                   {/* Date Selection */}
                   <div>
                     <label className="block text-stone-900 font-medium mb-3">Select Date</label>
@@ -305,10 +375,11 @@ const TurfBooking = () => {
                       </div>
 
                       <Button
-                        onClick={() => navigate('/auth')}
+                        onClick={handleBooking}
+                        disabled={isBooking || !isAuthenticated}
                         className="w-full bg-lime-400 hover:bg-lime-500 text-stone-900 font-semibold py-4 rounded-2xl"
                       >
-                        Reserve Now
+                        {isBooking ? 'Processing...' : isAuthenticated ? 'Reserve Now' : 'Login to Book'}
                       </Button>
                     </div>
                   )}
