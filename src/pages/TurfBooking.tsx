@@ -9,8 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Header } from '@/components/ui/header';
+import { PaymentModal } from '@/components/ui/payment-modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/contexts/BookingContext';
+import { usePayment, PaymentMethod } from '@/contexts/PaymentContext';
 import { toast } from '@/hooks/use-toast';
 
 const TurfBooking = () => {
@@ -18,6 +20,7 @@ const TurfBooking = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { createBooking } = useBooking();
+  const { getPaymentByBooking } = usePayment();
   
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -26,6 +29,8 @@ const TurfBooking = () => {
   const [contactNumber, setContactNumber] = useState('');
   const [specialRequests, setSpecialRequests] = useState('');
   const [isBooking, setIsBooking] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingBookingData, setPendingBookingData] = useState<any>(null);
 
   const turf = {
     id: id || '1',
@@ -65,27 +70,37 @@ const TurfBooking = () => {
       return;
     }
 
+    // Store booking data and show payment modal
+    setPendingBookingData({
+      turfId: turf.id,
+      turfName: turf.name,
+      date: selectedDate,
+      time: selectedTime,
+      duration,
+      playerName: user.name,
+      playerEmail: user.email,
+      totalAmount: turf.price * duration,
+      status: 'pending'
+    });
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentComplete = async (paymentId: string, method: PaymentMethod) => {
     setIsBooking(true);
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const bookingId = createBooking({
-        turfId: turf.id,
-        turfName: turf.name,
-        date: selectedDate,
-        time: selectedTime,
-        duration,
-        playerName: user.name,
-        playerEmail: user.email,
-        totalAmount: turf.price * duration,
-        status: 'confirmed'
+        ...pendingBookingData,
+        paymentId,
+        status: method === 'sslcommerz' ? 'confirmed' : 'pending'
       });
 
       toast({
-        title: "Booking Confirmed!",
-        description: `Your booking has been confirmed. Booking ID: ${bookingId}`,
+        title: "Booking Created!",
+        description: `Your booking has been created. Booking ID: ${bookingId}`,
       });
 
       // Reset form
@@ -94,6 +109,10 @@ const TurfBooking = () => {
       setTeamName('');
       setContactNumber('');
       setSpecialRequests('');
+      setPendingBookingData(null);
+
+      // Navigate to dashboard
+      navigate('/player?tab=bookings');
 
     } catch (error) {
       toast({
@@ -312,7 +331,7 @@ const TurfBooking = () => {
                   ) : (
                     <>
                       <CreditCard className="w-4 h-4 mr-2" />
-                      Confirm Booking
+                      Proceed to Payment
                     </>
                   )}
                 </Button>
@@ -321,6 +340,20 @@ const TurfBooking = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          setShowPaymentModal(false);
+          setPendingBookingData(null);
+        }}
+        amount={pendingBookingData?.totalAmount || 0}
+        title="Complete Your Booking"
+        description="Choose your payment method to confirm the turf booking"
+        onPaymentComplete={handlePaymentComplete}
+        bookingId={pendingBookingData?.id}
+      />
     </div>
   );
 };

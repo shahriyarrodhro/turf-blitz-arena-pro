@@ -12,7 +12,11 @@ interface Booking {
   playerEmail: string;
   totalAmount: number;
   status: 'confirmed' | 'pending' | 'cancelled';
+  paymentStatus: 'unpaid' | 'paid' | 'pending' | 'confirmed';
+  paymentId?: string;
   createdAt: string;
+  confirmedAt?: string;
+  confirmedBy?: string;
 }
 
 interface BookingContextType {
@@ -20,6 +24,7 @@ interface BookingContextType {
   createBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => string;
   getBookingsByUser: (email: string) => Booking[];
   updateBookingStatus: (id: string, status: Booking['status']) => void;
+  updatePaymentStatus: (id: string, paymentStatus: Booking['paymentStatus'], confirmedBy?: string) => void;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -45,7 +50,10 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       playerEmail: 'player@example.com',
       totalAmount: 2500,
       status: 'confirmed',
-      createdAt: '2024-12-01T10:00:00Z'
+      paymentStatus: 'confirmed',
+      createdAt: '2024-12-01T10:00:00Z',
+      confirmedAt: '2024-12-01T10:30:00Z',
+      confirmedBy: 'Champions Sports'
     }
   ]);
 
@@ -55,6 +63,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       ...bookingData,
       id,
       createdAt: new Date().toISOString(),
+      paymentStatus: bookingData.paymentStatus || 'unpaid'
     };
     
     setBookings(prev => [...prev, newBooking]);
@@ -73,11 +82,27 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
   };
 
+  const updatePaymentStatus = (id: string, paymentStatus: Booking['paymentStatus'], confirmedBy?: string) => {
+    setBookings(prev => 
+      prev.map(booking => 
+        booking.id === id 
+          ? { 
+              ...booking, 
+              paymentStatus,
+              confirmedAt: paymentStatus === 'confirmed' ? new Date().toISOString() : booking.confirmedAt,
+              confirmedBy: confirmedBy || booking.confirmedBy
+            } 
+          : booking
+      )
+    );
+  };
+
   const value = {
     bookings,
     createBooking,
     getBookingsByUser,
-    updateBookingStatus
+    updateBookingStatus,
+    updatePaymentStatus
   };
 
   return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;

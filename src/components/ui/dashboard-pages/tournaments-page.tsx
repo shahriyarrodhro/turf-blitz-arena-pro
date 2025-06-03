@@ -1,15 +1,19 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { PaymentModal } from '@/components/ui/payment-modal';
 import { Trophy, Calendar, MapPin, Users, Clock, Search, Filter, Star } from 'lucide-react';
+import { usePayment, PaymentMethod } from '@/contexts/PaymentContext';
 import { toast } from '@/hooks/use-toast';
 
 export const TournamentsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedTournament, setSelectedTournament] = useState<any>(null);
+  const { createPayment } = usePayment();
 
   const tournaments = [
     {
@@ -67,11 +71,30 @@ export const TournamentsPage = () => {
     }
   ];
 
-  const handleJoinTournament = (tournamentId: number, tournamentName: string) => {
-    toast({
-      title: "Tournament Registration",
-      description: `Successfully registered for ${tournamentName}!`,
-    });
+  const handleJoinTournament = (tournament: any) => {
+    setSelectedTournament(tournament);
+    setShowPaymentModal(true);
+  };
+
+  const handlePaymentComplete = async (paymentId: string, method: PaymentMethod) => {
+    try {
+      // Simulate tournament registration
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Tournament Registration Complete!",
+        description: `Successfully registered for ${selectedTournament?.name}. Payment ID: ${paymentId}`,
+      });
+
+      setShowPaymentModal(false);
+      setSelectedTournament(null);
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -222,7 +245,7 @@ export const TournamentsPage = () => {
                 
                 <div className="ml-6">
                   <Button
-                    onClick={() => handleJoinTournament(tournament.id, tournament.name)}
+                    onClick={() => handleJoinTournament(tournament)}
                     disabled={tournament.teams >= tournament.maxTeams}
                     className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl px-6 py-2 shadow-lg transition-all duration-300 hover:scale-105"
                   >
@@ -234,6 +257,20 @@ export const TournamentsPage = () => {
           ))}
         </CardContent>
       </Card>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          setShowPaymentModal(false);
+          setSelectedTournament(null);
+        }}
+        amount={selectedTournament ? parseInt(selectedTournament.registrationFee.replace(/[^\d]/g, '')) : 0}
+        title="Tournament Registration"
+        description={`Complete payment to join ${selectedTournament?.name}`}
+        onPaymentComplete={handlePaymentComplete}
+        tournamentId={selectedTournament?.id?.toString()}
+      />
     </div>
   );
 };

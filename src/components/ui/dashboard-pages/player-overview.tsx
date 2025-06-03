@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Trophy, Users, MapPin, Clock, Star, Target, Plus } from 'lucide-react';
+import { Calendar, Trophy, Users, MapPin, Clock, Star, Target, Plus, CreditCard } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/contexts/BookingContext';
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +35,15 @@ export const PlayerOverview = () => {
     { title: "Team Player", icon: Users, color: "text-blue-600" },
     { title: "Regular Scorer", icon: Target, color: "text-emerald-600" }
   ];
+
+  const getPaymentStatusColor = (status: string) => {
+    switch (status) {
+      case 'paid': return 'bg-emerald-100 text-emerald-700';
+      case 'confirmed': return 'bg-green-100 text-green-700';
+      case 'pending': return 'bg-yellow-100 text-yellow-700';
+      default: return 'bg-red-100 text-red-700';
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -83,14 +91,23 @@ export const PlayerOverview = () => {
                         <Clock className="w-4 h-4 mr-1" />
                         {booking.date} at {booking.time}
                       </div>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Badge className={`${
+                          booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                          booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        } rounded-2xl px-3 py-1`}>
+                          {booking.status}
+                        </Badge>
+                        <Badge className={`${getPaymentStatusColor(booking.paymentStatus)} rounded-2xl px-3 py-1 flex items-center`}>
+                          <CreditCard className="w-3 h-3 mr-1" />
+                          {booking.paymentStatus}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge className={`${
-                      booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                      booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    } rounded-2xl px-3 py-1`}>
-                      {booking.status}
-                    </Badge>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-gray-800">৳{booking.totalAmount}</div>
+                    </div>
                   </div>
                 </div>
               ))
