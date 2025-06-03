@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { BookingProvider } from '@/contexts/BookingContext';
 import { PaymentProvider } from '@/contexts/PaymentContext';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import './App.css';
 
 // Lazy load components
