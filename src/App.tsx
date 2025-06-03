@@ -12,6 +12,7 @@ import './App.css';
 const Index = lazy(() => import('@/pages/Index'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const Turfs = lazy(() => import('@/pages/Turfs'));
+const TurfDetails = lazy(() => import('@/pages/TurfDetails'));
 const TurfBooking = lazy(() => import('@/pages/TurfBooking'));
 const PlayerDashboard = lazy(() => import('@/pages/PlayerDashboard'));
 const TurfOwnerDashboard = lazy(() => import('@/pages/TurfOwnerDashboard'));
@@ -35,6 +36,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/turfs" element={<Turfs />} />
+                  <Route path="/turf/:id" element={<TurfDetails />} />
                   <Route path="/turf/:id/book" element={<TurfBooking />} />
                   <Route path="/tournaments" element={<Tournaments />} />
                   

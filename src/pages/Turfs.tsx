@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee } from 'lucide-react';
+import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -338,13 +337,24 @@ const Turfs = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
                       <span className="text-2xl font-bold text-gray-800">{turf.price}</span>
                     </div>
+                  </div>
+
+                  <div className="flex gap-2">
                     <Button
                       onClick={() => navigate(`/turf/${turf.id}`)}
-                      className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl px-6 py-2 shadow-lg transition-all duration-300 hover:scale-105"
+                      variant="outline"
+                      className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-2xl"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </Button>
+                    <Button
+                      onClick={() => navigate(`/turf/${turf.id}/book`)}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-105"
                     >
                       Book Now
                       <ChevronRight className="w-4 h-4 ml-1" />
