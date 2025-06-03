@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee, Eye } from 'lucide-react';
+import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee, Eye, Shield, Zap, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,10 +36,15 @@ const Turfs = () => {
       price: "৳1,500/hour",
       priceValue: 1500,
       image: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=500",
-      features: ["Floodlights", "Parking", "Changing Rooms", "WiFi"],
+      features: ["Floodlights", "Parking", "Changing Rooms", "WiFi", "Security", "Equipment Rental"],
       availability: "Available Today",
       type: "Premium",
-      size: "Full Size (11v11)"
+      size: "Full Size (11v11)",
+      contact: "+880 1712-345678",
+      operatingHours: "6:00 AM - 11:00 PM",
+      surface: "Artificial Grass",
+      capacity: "22 Players",
+      description: "Professional-grade football turf with state-of-the-art facilities and excellent drainage system."
     },
     {
       id: 2,
@@ -50,10 +56,15 @@ const Turfs = () => {
       price: "৳1,200/hour",
       priceValue: 1200,
       image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=500",
-      features: ["Floodlights", "Cafeteria", "Parking"],
+      features: ["Floodlights", "Cafeteria", "Parking", "WiFi"],
       availability: "Available Tomorrow",
       type: "Standard",
-      size: "7v7"
+      size: "7v7",
+      contact: "+880 1798-765432",
+      operatingHours: "7:00 AM - 10:00 PM",
+      surface: "Natural Grass",
+      capacity: "14 Players",
+      description: "Well-maintained natural grass field perfect for casual and competitive matches."
     },
     {
       id: 3,
@@ -65,10 +76,15 @@ const Turfs = () => {
       price: "৳2,000/hour",
       priceValue: 2000,
       image: "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=500",
-      features: ["Floodlights", "Parking", "Changing Rooms", "WiFi", "Cafeteria", "Equipment Rental"],
+      features: ["Floodlights", "Parking", "Changing Rooms", "WiFi", "Cafeteria", "Equipment Rental", "Security", "First Aid"],
       availability: "Available Now",
       type: "Premium",
-      size: "Full Size (11v11)"
+      size: "Full Size (11v11)",
+      contact: "+880 1555-999888",
+      operatingHours: "5:00 AM - 12:00 AM",
+      surface: "Hybrid Grass",
+      capacity: "22 Players",
+      description: "Premium sports complex with multiple fields, professional lighting, and comprehensive facilities."
     },
     {
       id: 4,
@@ -83,7 +99,12 @@ const Turfs = () => {
       features: ["Basic Lighting", "Parking"],
       availability: "Available Tomorrow",
       type: "Budget",
-      size: "5v5"
+      size: "5v5",
+      contact: "+880 1666-777888",
+      operatingHours: "6:00 AM - 9:00 PM",
+      surface: "Artificial Grass",
+      capacity: "10 Players",
+      description: "Affordable option for small group matches with basic facilities."
     },
     {
       id: 5,
@@ -95,10 +116,15 @@ const Turfs = () => {
       price: "৳1,800/hour",
       priceValue: 1800,
       image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=500",
-      features: ["Floodlights", "Parking", "Changing Rooms", "Cafeteria"],
+      features: ["Floodlights", "Parking", "Changing Rooms", "Cafeteria", "Security"],
       availability: "Available Today",
       type: "Premium",
-      size: "Full Size (11v11)"
+      size: "Full Size (11v11)",
+      contact: "+880 1777-888999",
+      operatingHours: "6:00 AM - 11:00 PM",
+      surface: "Artificial Grass",
+      capacity: "22 Players",
+      description: "Modern stadium with excellent facilities and sea view ambiance."
     },
     {
       id: 6,
@@ -107,13 +133,18 @@ const Turfs = () => {
       city: "Sylhet",
       rating: 4.5,
       reviews: 72,
-      price: "₺1,000/hour",
+      price: "৳1,000/hour",
       priceValue: 1000,
       image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500",
-      features: ["Floodlights", "Parking", "WiFi"],
+      features: ["Floodlights", "Parking", "WiFi", "Equipment Rental"],
       availability: "Available Now",
       type: "Standard",
-      size: "7v7"
+      size: "7v7",
+      contact: "+880 1888-999000",
+      operatingHours: "7:00 AM - 10:00 PM",
+      surface: "Natural Grass",
+      capacity: "14 Players",
+      description: "Scenic location with well-maintained natural grass and mountain views."
     }
   ];
 
@@ -136,10 +167,12 @@ const Turfs = () => {
 
   const getFeatureIcon = (feature: string) => {
     switch (feature.toLowerCase()) {
-      case 'floodlights': return <Clock className="w-4 h-4" />;
+      case 'floodlights': return <Zap className="w-4 h-4" />;
       case 'parking': return <Car className="w-4 h-4" />;
       case 'wifi': return <Wifi className="w-4 h-4" />;
       case 'cafeteria': return <Coffee className="w-4 h-4" />;
+      case 'security': return <Shield className="w-4 h-4" />;
+      case 'changing rooms': return <Users className="w-4 h-4" />;
       default: return <Star className="w-4 h-4" />;
     }
   };
@@ -309,7 +342,7 @@ const Turfs = () => {
                       <MapPin className="w-4 h-4 mr-2 text-emerald-600" />
                       <span className="text-sm">{turf.location}</span>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4 mb-3">
                       <div className="flex items-center">
                         <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
                         <span className="text-sm font-semibold text-gray-800">{turf.rating}</span>
@@ -319,19 +352,37 @@ const Turfs = () => {
                         {turf.size}
                       </Badge>
                     </div>
+                    
+                    {/* Additional Details */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Surface:</span>
+                        <span className="font-medium text-gray-800">{turf.surface}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Capacity:</span>
+                        <span className="font-medium text-gray-800">{turf.capacity}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Hours:</span>
+                        <span className="font-medium text-gray-800">{turf.operatingHours}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{turf.description}</p>
                   </div>
 
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-2">
-                      {turf.features.slice(0, 3).map((feature, idx) => (
+                      {turf.features.slice(0, 4).map((feature, idx) => (
                         <div key={idx} className="flex items-center bg-gray-100/80 rounded-2xl px-3 py-1">
                           {getFeatureIcon(feature)}
                           <span className="text-xs text-gray-700 ml-1">{feature}</span>
                         </div>
                       ))}
-                      {turf.features.length > 3 && (
+                      {turf.features.length > 4 && (
                         <div className="flex items-center bg-gray-100/80 rounded-2xl px-3 py-1">
-                          <span className="text-xs text-gray-700">+{turf.features.length - 3} more</span>
+                          <span className="text-xs text-gray-700">+{turf.features.length - 4} more</span>
                         </div>
                       )}
                     </div>
@@ -340,6 +391,10 @@ const Turfs = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <span className="text-2xl font-bold text-gray-800">{turf.price}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Phone className="w-4 h-4 mr-1" />
+                      <span>{turf.contact}</span>
                     </div>
                   </div>
 

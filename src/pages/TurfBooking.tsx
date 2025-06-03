@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Star, Users, Clock, Wifi, Car, ShowerHead, Calendar, CreditCard } from 'lucide-react';
@@ -22,7 +23,10 @@ const TurfBooking = () => {
   const { createBooking } = useBooking();
   const { getPaymentByBooking } = usePayment();
   
-  const [selectedDate, setSelectedDate] = useState('');
+  // Get today's date as default
+  const today = new Date().toISOString().split('T')[0];
+  
+  const [selectedDate, setSelectedDate] = useState(today);
   const [selectedTime, setSelectedTime] = useState('');
   const [duration, setDuration] = useState(1);
   const [teamName, setTeamName] = useState('');
@@ -31,6 +35,17 @@ const TurfBooking = () => {
   const [isBooking, setIsBooking] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [pendingBookingData, setPendingBookingData] = useState<any>(null);
+
+  // Auto-populate user details when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setContactNumber(user.phone || '');
+      // Set team name from user name if available
+      if (user.name) {
+        setTeamName(`${user.name}'s Team`);
+      }
+    }
+  }, [isAuthenticated, user]);
 
   const turf = {
     id: id || '1',
@@ -44,6 +59,15 @@ const TurfBooking = () => {
     description: 'Premium football turf with state-of-the-art facilities...',
     owner: 'Champions Sports Complex',
     contact: '+880 1711-123456'
+  };
+
+  // Convert 24-hour to 12-hour format
+  const formatTime12Hour = (time24: string) => {
+    const [hours, minutes] = time24.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
   };
 
   const availableSlots = [
@@ -104,10 +128,8 @@ const TurfBooking = () => {
       });
 
       // Reset form
-      setSelectedDate('');
+      setSelectedDate(today);
       setSelectedTime('');
-      setTeamName('');
-      setContactNumber('');
       setSpecialRequests('');
       setPendingBookingData(null);
 
@@ -241,7 +263,7 @@ const TurfBooking = () => {
 
                 <div>
                   <Label>Available Time Slots</Label>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
+                  <div className="grid grid-cols-2 gap-2 mt-2">
                     {availableSlots.map((slot) => (
                       <Button
                         key={slot}
@@ -254,7 +276,7 @@ const TurfBooking = () => {
                             : 'border-white/30 bg-white/20 hover:bg-white/40'
                         }`}
                       >
-                        {slot}
+                        {formatTime12Hour(slot)}
                       </Button>
                     ))}
                   </div>
@@ -293,9 +315,30 @@ const TurfBooking = () => {
                   />
                 </div>
 
+                {/* Pricing Summary */}
+                {duration > 0 && (
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-200">
+                    <h4 className="font-semibold text-gray-800 mb-2">Pricing Details</h4>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span>Rate per hour:</span>
+                        <span className="font-medium">৳{turf.price}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Duration:</span>
+                        <span className="font-medium">{duration} hour(s)</span>
+                      </div>
+                      <div className="flex justify-between border-t border-emerald-200 pt-2 mt-2">
+                        <span className="font-semibold">Total Amount:</span>
+                        <span className="font-bold text-emerald-600">৳{turf.price * duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Booking Summary */}
                 {selectedDate && selectedTime && (
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-2xl border border-emerald-200">
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-200">
                     <h4 className="font-semibold text-gray-800 mb-2">Booking Summary</h4>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
@@ -304,15 +347,11 @@ const TurfBooking = () => {
                       </div>
                       <div className="flex justify-between">
                         <span>Time:</span>
-                        <span className="font-medium">{selectedTime}</span>
+                        <span className="font-medium">{formatTime12Hour(selectedTime)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Duration:</span>
-                        <span className="font-medium">{duration} hour(s)</span>
-                      </div>
-                      <div className="flex justify-between border-t border-emerald-200 pt-2 mt-2">
-                        <span className="font-semibold">Total:</span>
-                        <span className="font-bold text-emerald-600">৳{turf.price * duration}</span>
+                        <span>Team:</span>
+                        <span className="font-medium">{teamName || 'Not specified'}</span>
                       </div>
                     </div>
                   </div>
