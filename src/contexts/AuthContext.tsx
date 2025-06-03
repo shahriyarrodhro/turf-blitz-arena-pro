@@ -14,7 +14,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   register: (userData: Omit<User, 'id'> & { password: string }) => Promise<void>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
@@ -79,27 +79,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const foundUser = mockUsers.find(u => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Set session with 24 hour expiry
-      const expiry = new Date().getTime() + (24 * 60 * 60 * 1000);
-      localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
-      localStorage.setItem('turfx_session_expiry', expiry.toString());
-    } else {
-      throw new Error('Invalid credentials');
+      const foundUser = mockUsers.find(u => u.email === email && u.password === password);
+      
+      if (foundUser) {
+        const { password: _, ...userWithoutPassword } = foundUser;
+        setUser(userWithoutPassword);
+        
+        // Set session with 24 hour expiry
+        const expiry = new Date().getTime() + (24 * 60 * 60 * 1000);
+        localStorage.setItem('turfx_user', JSON.stringify(userWithoutPassword));
+        localStorage.setItem('turfx_session_expiry', expiry.toString());
+        
+        setIsLoading(false);
+        return true;
+      } else {
+        setIsLoading(false);
+        return false;
+      }
+    } catch (error) {
+      setIsLoading(false);
+      return false;
     }
-    
-    setIsLoading(false);
   };
 
   const register = async (userData: Omit<User, 'id'> & { password: string }) => {
