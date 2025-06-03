@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, ArrowLeft, Loader2 } from 'lucide-react';
+import { User, Mail, ArrowLeft, Loader2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -58,7 +58,7 @@ const Auth = () => {
         // Redirect based on role
         if (loginEmail === 'admin@example.com') {
           navigate('/admin');
-        } else if (loginEmail === 'turf@example.com') {
+        } else if (loginEmail === 'owner@example.com') {
           navigate('/turf-owner');
         } else {
           navigate('/player');
@@ -121,7 +121,7 @@ const Auth = () => {
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Demo Accounts:</h3>
                 
                 <Button
-                  onClick={() => handleLogin('player@example.com', 'player123')}
+                  onClick={() => handleLogin('player@example.com', 'password123')}
                   variant="outline"
                   disabled={isLoading}
                   className="w-full justify-start border-white/30 hover:bg-white/60 rounded-2xl py-3 backdrop-blur-sm bg-white/20 hover:shadow-lg transition-all duration-300"
@@ -134,7 +134,7 @@ const Auth = () => {
                 </Button>
 
                 <Button
-                  onClick={() => handleLogin('turf@example.com', 'turf123')}
+                  onClick={() => handleLogin('owner@example.com', 'password123')}
                   variant="outline"
                   disabled={isLoading}
                   className="w-full justify-start border-white/30 hover:bg-white/60 rounded-2xl py-3 backdrop-blur-sm bg-white/20 hover:shadow-lg transition-all duration-300"
@@ -142,17 +142,17 @@ const Auth = () => {
                   <Mail className="w-4 h-4 mr-3" />
                   <div className="text-left">
                     <div className="font-medium">Turf Owner Demo</div>
-                    <div className="text-xs text-gray-600">turf@example.com</div>
+                    <div className="text-xs text-gray-600">owner@example.com</div>
                   </div>
                 </Button>
 
                 <Button
-                  onClick={() => handleLogin('admin@example.com', 'admin123')}
+                  onClick={() => handleLogin('admin@example.com', 'password123')}
                   variant="outline"
                   disabled={isLoading}
                   className="w-full justify-start border-white/30 hover:bg-white/60 rounded-2xl py-3 backdrop-blur-sm bg-white/20 hover:shadow-lg transition-all duration-300"
                 >
-                  <User className="w-4 h-4 mr-3" />
+                  <Shield className="w-4 h-4 mr-3" />
                   <div className="text-left">
                     <div className="font-medium">Admin Demo</div>
                     <div className="text-xs text-gray-600">admin@example.com</div>
