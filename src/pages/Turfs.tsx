@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee, Eye, Shield, Zap, Phone } from 'lucide-react';
+import { MapPin, Star, Clock, Users, Search, Filter, ChevronRight, Calendar, Trophy, Wifi, Car, Coffee, Eye, Shield, Zap, Phone, Heart, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +14,7 @@ const Turfs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedPrice, setSelectedPrice] = useState('All');
+  const [selectedFormat, setSelectedFormat] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
 
   const bangladeshCities = [
@@ -24,6 +24,8 @@ const Turfs = () => {
   const priceRanges = [
     'All', '৳500-1000', '৳1000-2000', '৳2000-3000', '৳3000+'
   ];
+
+  const formats = ['All', '5v5', '7v7', '11v11'];
 
   const turfs = [
     {
@@ -44,7 +46,11 @@ const Turfs = () => {
       operatingHours: "6:00 AM - 11:00 PM",
       surface: "Artificial Grass",
       capacity: "22 Players",
-      description: "Professional-grade football turf with state-of-the-art facilities and excellent drainage system."
+      description: "Professional-grade football turf with state-of-the-art facilities and excellent drainage system. Perfect for tournaments and professional matches.",
+      isVerified: true,
+      totalBookings: 248,
+      responseTime: "5 mins",
+      cancellationPolicy: "Free cancellation up to 2 hours before"
     },
     {
       id: 2,
@@ -64,7 +70,11 @@ const Turfs = () => {
       operatingHours: "7:00 AM - 10:00 PM",
       surface: "Natural Grass",
       capacity: "14 Players",
-      description: "Well-maintained natural grass field perfect for casual and competitive matches."
+      description: "Well-maintained natural grass field perfect for casual and competitive matches. Features modern amenities and excellent accessibility.",
+      isVerified: true,
+      totalBookings: 156,
+      responseTime: "10 mins",
+      cancellationPolicy: "Free cancellation up to 4 hours before"
     },
     {
       id: 3,
@@ -84,7 +94,11 @@ const Turfs = () => {
       operatingHours: "5:00 AM - 12:00 AM",
       surface: "Hybrid Grass",
       capacity: "22 Players",
-      description: "Premium sports complex with multiple fields, professional lighting, and comprehensive facilities."
+      description: "Premium sports complex with multiple fields, professional lighting, and comprehensive facilities. Home to several professional tournaments.",
+      isVerified: true,
+      totalBookings: 312,
+      responseTime: "2 mins",
+      cancellationPolicy: "Free cancellation up to 1 hour before"
     },
     {
       id: 4,
@@ -153,6 +167,7 @@ const Turfs = () => {
     const matchesSearch = turf.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          turf.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCity = selectedCity === 'All' || turf.city === selectedCity;
+    const matchesFormat = selectedFormat === 'All' || turf.size.includes(selectedFormat);
     
     let matchesPrice = true;
     if (selectedPrice !== 'All') {
@@ -162,7 +177,7 @@ const Turfs = () => {
       matchesPrice = turf.priceValue >= min && (max === Infinity || turf.priceValue <= max);
     }
     
-    return matchesSearch && matchesCity && matchesPrice;
+    return matchesSearch && matchesCity && matchesPrice && matchesFormat;
   });
 
   const getFeatureIcon = (feature: string) => {
@@ -173,21 +188,21 @@ const Turfs = () => {
       case 'cafeteria': return <Coffee className="w-4 h-4" />;
       case 'security': return <Shield className="w-4 h-4" />;
       case 'changing rooms': return <Users className="w-4 h-4" />;
-      default: return <Star className="w-4 h-4" />;
+      default: return <CheckCircle className="w-4 h-4" />;
     }
   };
 
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
-      case 'Premium': return 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-200';
-      case 'Standard': return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 border-blue-200';
-      case 'Budget': return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'Premium': return 'bg-gradient-to-r from-purple-400 to-pink-500 text-white';
+      case 'Standard': return 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white';
+      case 'Budget': return 'bg-gradient-to-r from-green-400 to-emerald-500 text-white';
+      default: return 'bg-gray-400 text-white';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/30 via-white to-teal-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 relative overflow-hidden">
       {/* Enhanced background effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-emerald-200/20 to-teal-200/20 rounded-full opacity-60 blur-3xl animate-pulse"></div>
@@ -212,7 +227,7 @@ const Turfs = () => {
           </p>
         </motion.div>
 
-        {/* Search and Filters */}
+        {/* Advanced Search and Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -225,7 +240,7 @@ const Turfs = () => {
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <Input
-                    placeholder="Search turfs by name or location..."
+                    placeholder="Search turfs by name, location, or features..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-12 h-14 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm text-lg placeholder:text-gray-500"
@@ -238,7 +253,7 @@ const Turfs = () => {
                 >
                   <Filter className="w-5 h-5 mr-2" />
                   Filters
-                  {(selectedCity !== 'All' || selectedPrice !== 'All') && (
+                  {(selectedCity !== 'All' || selectedPrice !== 'All' || selectedFormat !== 'All') && (
                     <Badge className="ml-2 bg-emerald-500 text-white w-3 h-3 p-0 rounded-full" />
                   )}
                 </Button>
@@ -249,7 +264,7 @@ const Turfs = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/20"
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/20"
                 >
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
@@ -257,9 +272,22 @@ const Turfs = () => {
                       <SelectTrigger className="h-12 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm">
                         <SelectValue placeholder="Select city" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="backdrop-blur-2xl bg-white/90 border border-white/30 rounded-2xl">
                         {bangladeshCities.map(city => (
                           <SelectItem key={city} value={city}>{city}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Format</label>
+                    <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                      <SelectTrigger className="h-12 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm">
+                        <SelectValue placeholder="Select format" />
+                      </SelectTrigger>
+                      <SelectContent className="backdrop-blur-2xl bg-white/90 border border-white/30 rounded-2xl">
+                        {formats.map(format => (
+                          <SelectItem key={format} value={format}>{format}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -270,7 +298,7 @@ const Turfs = () => {
                       <SelectTrigger className="h-12 rounded-2xl border-white/30 bg-white/50 backdrop-blur-sm">
                         <SelectValue placeholder="Select price range" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="backdrop-blur-2xl bg-white/90 border border-white/30 rounded-2xl">
                         {priceRanges.map(range => (
                           <SelectItem key={range} value={range}>{range}</SelectItem>
                         ))}
@@ -291,22 +319,22 @@ const Turfs = () => {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Available Turfs</h2>
-            <p className="text-gray-600">{filteredTurfs.length} turfs found</p>
+            <h2 className="text-3xl font-bold text-gray-800">Available Turfs</h2>
+            <p className="text-gray-600 text-lg">{filteredTurfs.length} turfs found matching your criteria</p>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="rounded-2xl border-white/30 bg-white/20 hover:bg-white/40">
+            <Button variant="outline" className="rounded-2xl border-white/30 bg-white/20 hover:bg-white/40 backdrop-blur-sm">
               <Calendar className="w-4 h-4 mr-2" />
               Sort by Date
             </Button>
-            <Button variant="outline" className="rounded-2xl border-white/30 bg-white/20 hover:bg-white/40">
+            <Button variant="outline" className="rounded-2xl border-white/30 bg-white/20 hover:bg-white/40 backdrop-blur-sm">
               <Trophy className="w-4 h-4 mr-2" />
               Sort by Rating
             </Button>
           </div>
         </motion.div>
 
-        {/* Turfs Grid */}
+        {/* Enhanced Turfs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredTurfs.map((turf, index) => (
             <motion.div
@@ -316,68 +344,90 @@ const Turfs = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
               <Card className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105 group overflow-hidden">
-                <div className="relative h-48 overflow-hidden rounded-t-3xl">
+                <div className="relative h-52 overflow-hidden rounded-t-3xl">
                   <img
                     src={turf.image}
                     alt={turf.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 left-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  <div className="absolute top-4 left-4 flex items-center space-x-2">
                     <Badge className={`${getTypeBadgeColor(turf.type)} rounded-2xl px-3 py-1 font-semibold shadow-lg backdrop-blur-sm`}>
                       {turf.type}
                     </Badge>
+                    {turf.isVerified && (
+                      <Badge className="bg-blue-500/90 text-white rounded-2xl px-3 py-1 font-semibold shadow-lg backdrop-blur-sm">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Verified
+                      </Badge>
+                    )}
                   </div>
+                  
                   <div className="absolute top-4 right-4">
-                    <Badge className="bg-emerald-100/90 text-emerald-700 rounded-2xl px-3 py-1 font-semibold shadow-lg backdrop-blur-sm">
+                    <Button size="icon" variant="ghost" className="backdrop-blur-md bg-white/20 hover:bg-white/40 rounded-full text-white">
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="absolute bottom-4 left-4">
+                    <Badge className="bg-emerald-500/90 text-white rounded-2xl px-3 py-1 font-semibold shadow-lg backdrop-blur-sm">
                       {turf.availability}
                     </Badge>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  <div className="absolute bottom-4 right-4">
+                    <Badge className="bg-gradient-to-r from-orange-400 to-red-500 text-white rounded-2xl px-3 py-1 font-bold shadow-lg backdrop-blur-sm">
+                      {turf.price}
+                    </Badge>
+                  </div>
                 </div>
                 
                 <CardContent className="p-6">
                   <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{turf.name}</h3>
-                    <div className="flex items-center text-gray-600 mb-2">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-xl font-bold text-gray-800 leading-tight">{turf.name}</h3>
+                      <div className="flex items-center ml-2">
+                        <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
+                        <span className="text-sm font-semibold text-gray-800">{turf.rating}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center text-gray-600 mb-3">
                       <MapPin className="w-4 h-4 mr-2 text-emerald-600" />
                       <span className="text-sm">{turf.location}</span>
                     </div>
-                    <div className="flex items-center space-x-4 mb-3">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
-                        <span className="text-sm font-semibold text-gray-800">{turf.rating}</span>
-                        <span className="text-sm text-gray-600 ml-1">({turf.reviews})</span>
-                      </div>
-                      <Badge className="bg-blue-100/80 text-blue-700 rounded-2xl px-3 py-1 text-xs">
-                        {turf.size}
-                      </Badge>
-                    </div>
                     
-                    {/* Additional Details */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center justify-between text-sm">
+                    <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Format:</span>
+                        <Badge className="bg-purple-100 text-purple-700 rounded-full px-2 py-1 text-xs">
+                          {turf.size.includes('11v11') ? '11v11' : turf.size.includes('7v7') ? '7v7' : '5v5'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
                         <span className="text-gray-600">Surface:</span>
-                        <span className="font-medium text-gray-800">{turf.surface}</span>
+                        <span className="font-medium text-gray-800 text-xs">{turf.surface}</span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between">
                         <span className="text-gray-600">Capacity:</span>
-                        <span className="font-medium text-gray-800">{turf.capacity}</span>
+                        <span className="font-medium text-gray-800 text-xs">{turf.capacity}</span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Hours:</span>
-                        <span className="font-medium text-gray-800">{turf.operatingHours}</span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Response:</span>
+                        <span className="font-medium text-emerald-600 text-xs">{turf.responseTime}</span>
                       </div>
                     </div>
 
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{turf.description}</p>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{turf.description}</p>
                   </div>
 
                   <div className="mb-4">
                     <div className="flex flex-wrap gap-2">
                       {turf.features.slice(0, 4).map((feature, idx) => (
-                        <div key={idx} className="flex items-center bg-gray-100/80 rounded-2xl px-3 py-1">
+                        <div key={idx} className="flex items-center bg-gray-100/80 rounded-2xl px-3 py-1 text-xs">
                           {getFeatureIcon(feature)}
-                          <span className="text-xs text-gray-700 ml-1">{feature}</span>
+                          <span className="text-gray-700 ml-1">{feature}</span>
                         </div>
                       ))}
                       {turf.features.length > 4 && (
@@ -388,13 +438,13 @@ const Turfs = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <span className="text-2xl font-bold text-gray-800">{turf.price}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center justify-between mb-4 text-sm">
+                    <div className="flex items-center text-gray-600">
                       <Phone className="w-4 h-4 mr-1" />
                       <span>{turf.contact}</span>
+                    </div>
+                    <div className="text-emerald-600 font-medium">
+                      {turf.totalBookings} bookings
                     </div>
                   </div>
 
@@ -405,7 +455,7 @@ const Turfs = () => {
                       className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50 rounded-2xl"
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      View Details
+                      Details
                     </Button>
                     <Button
                       onClick={() => navigate(`/turf/${turf.id}/book`)}
@@ -437,6 +487,7 @@ const Turfs = () => {
                 setSearchTerm('');
                 setSelectedCity('All');
                 setSelectedPrice('All');
+                setSelectedFormat('All');
               }}
               className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl px-8 py-3"
             >
