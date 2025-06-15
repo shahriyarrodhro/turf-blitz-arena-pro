@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, Calendar, MapPin, Users, DollarSign, Plus, Star, Clock, TrendingUp, Bell, Search, Filter } from 'lucide-react';
@@ -12,6 +13,11 @@ import { ChatComponent } from '@/components/ui/chat-component';
 import { NotificationsComponent } from '@/components/ui/notifications';
 import { SettingsComponent } from '@/components/ui/settings';
 import { PaymentsPage } from '@/components/ui/dashboard-pages/payments-page';
+import { TurfOwnerOverview } from '@/components/ui/dashboard-pages/turf-owner-overview';
+import { TurfManagement } from '@/components/ui/dashboard-pages/turf-management';
+import { BookingManagement } from '@/components/ui/dashboard-pages/booking-management';
+import { AnalyticsDashboard } from '@/components/ui/dashboard-pages/analytics-dashboard';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TurfOwnerDashboard = () => {
   const navigate = useNavigate();
@@ -20,6 +26,7 @@ const TurfOwnerDashboard = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { user } = useAuth();
 
   // Check for tab parameter in URL
   useEffect(() => {
@@ -29,11 +36,77 @@ const TurfOwnerDashboard = () => {
     }
   }, [searchParams]);
 
-  const stats = [
-    { label: 'Total Revenue', value: '৳45,000', icon: DollarSign, change: '+12% this month', color: 'from-emerald-500 to-teal-600' },
-    { label: 'Bookings Today', value: '8', icon: Calendar, change: '3 pending', color: 'from-blue-500 to-purple-600' },
-    { label: 'Total Turfs', value: '3', icon: MapPin, change: '1 premium', color: 'from-purple-500 to-pink-600' },
-    { label: 'Rating', value: '4.8', icon: Star, change: '124 reviews', color: 'from-yellow-500 to-orange-600' }
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    bookingsToday: 0,
+    totalTurfs: 0,
+    rating: 4.8
+  });
+
+  useEffect(() => {
+    loadStats();
+  }, [user]);
+
+  const loadStats = () => {
+    if (!user) return;
+
+    // Load turfs owned by current user
+    const allTurfs = JSON.parse(localStorage.getItem('turfs') || '[]');
+    const ownerTurfs = allTurfs.filter(turf => turf.ownerId === user.id);
+    
+    // Load bookings for owner's turfs
+    const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    const ownerBookings = allBookings.filter(booking => {
+      const turf = allTurfs.find(t => t.id === booking.turfId);
+      return turf?.ownerId === user.id;
+    });
+
+    // Calculate today's bookings
+    const today = new Date().toISOString().split('T')[0];
+    const todayBookings = ownerBookings.filter(booking => booking.date === today);
+
+    // Calculate total revenue
+    const totalRevenue = ownerBookings
+      .filter(b => b.status === 'confirmed')
+      .reduce((acc, booking) => acc + booking.amount, 0);
+
+    setStats({
+      totalRevenue,
+      bookingsToday: todayBookings.length,
+      totalTurfs: ownerTurfs.length,
+      rating: 4.8
+    });
+  };
+
+  const statsData = [
+    { 
+      label: 'Total Revenue', 
+      value: `৳${stats.totalRevenue.toLocaleString()}`, 
+      icon: DollarSign, 
+      change: '+12% this month', 
+      color: 'from-emerald-500 to-teal-600' 
+    },
+    { 
+      label: 'Bookings Today', 
+      value: stats.bookingsToday.toString(), 
+      icon: Calendar, 
+      change: '3 pending', 
+      color: 'from-blue-500 to-purple-600' 
+    },
+    { 
+      label: 'Total Turfs', 
+      value: stats.totalTurfs.toString(), 
+      icon: MapPin, 
+      change: `${stats.totalTurfs > 0 ? '1 premium' : 'Add first turf'}`, 
+      color: 'from-purple-500 to-pink-600' 
+    },
+    { 
+      label: 'Rating', 
+      value: stats.rating.toString(), 
+      icon: Star, 
+      change: '124 reviews', 
+      color: 'from-yellow-500 to-orange-600' 
+    }
   ];
 
   return (
@@ -47,8 +120,8 @@ const TurfOwnerDashboard = () => {
       {/* Sidebar */}
       <AppSidebar
         userRole="turf-owner"
-        userName="Champions Sports"
-        userAvatar="CS"
+        userName={user?.name || "Turf Owner"}
+        userAvatar="TO"
         onChatOpen={() => setIsChatOpen(true)}
         onNotificationsOpen={() => setIsNotificationsOpen(true)}
         onSettingsOpen={() => setIsSettingsOpen(true)}
@@ -64,7 +137,7 @@ const TurfOwnerDashboard = () => {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
                   Turf Owner Dashboard
                 </h1>
-                <p className="text-gray-600">Champions Sports Dashboard 🏟️</p>
+                <p className="text-gray-600">Welcome {user?.name || "Turf Owner"} 🏟️</p>
               </div>
               
               <div className="flex items-center space-x-4">
@@ -96,7 +169,7 @@ const TurfOwnerDashboard = () => {
             transition={{ delay: 0.1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
           >
-            {stats.map((stat, index) => (
+            {statsData.map((stat, index) => (
               <Card key={stat.label} className="backdrop-blur-2xl bg-white/40 border border-white/30 rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
@@ -125,22 +198,16 @@ const TurfOwnerDashboard = () => {
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="bookings" 
-                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
-                  >
-                    Bookings
-                  </TabsTrigger>
-                  <TabsTrigger 
                     value="turfs" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
                     My Turfs
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="reviews" 
+                    value="bookings" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
                   >
-                    Reviews
+                    Bookings
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics" 
@@ -154,78 +221,32 @@ const TurfOwnerDashboard = () => {
                   >
                     Revenue
                   </TabsTrigger>
+                  <TabsTrigger 
+                    value="reviews" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-emerald-700 transition-all duration-300"
+                  >
+                    Reviews
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Today's Performance */}
-                    <Card className="backdrop-blur-xl bg-white/40 border border-white/30 rounded-3xl shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <BarChart3 className="w-5 h-5 mr-2 text-emerald-600" />
-                          Today's Performance
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Total Bookings</span>
-                          <span className="text-gray-800 font-semibold">8</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Revenue</span>
-                          <span className="text-emerald-600 font-semibold">৳20,000</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Occupancy Rate</span>
-                          <span className="text-blue-600 font-semibold">75%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Pending Approvals</span>
-                          <span className="text-orange-600 font-semibold">3</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Quick Actions */}
-                    <Card className="backdrop-blur-xl bg-white/40 border border-white/30 rounded-3xl shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="text-gray-800 flex items-center">
-                          <Plus className="w-5 h-5 mr-2 text-emerald-600" />
-                          Quick Actions
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <Button className="w-full justify-start bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 rounded-xl">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add New Turf
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl">
-                          <Calendar className="w-4 h-4 mr-2" />
-                          Create Tournament
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl">
-                          <BarChart3 className="w-4 h-4 mr-2" />
-                          View Analytics
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="bookings" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Calendar className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Bookings Management</h3>
-                    <p className="text-gray-600 text-lg">Manage your turf bookings and approvals</p>
-                  </div>
+                  <TurfOwnerOverview />
                 </TabsContent>
 
                 <TabsContent value="turfs" className="space-y-6">
-                  <div className="text-center py-16">
-                    <MapPin className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Turf Management</h3>
-                    <p className="text-gray-600 text-lg">Manage your turf listings and settings</p>
-                  </div>
+                  <TurfManagement />
+                </TabsContent>
+
+                <TabsContent value="bookings" className="space-y-6">
+                  <BookingManagement />
+                </TabsContent>
+
+                <TabsContent value="analytics" className="space-y-6">
+                  <AnalyticsDashboard />
+                </TabsContent>
+
+                <TabsContent value="revenue" className="space-y-6">
+                  <PaymentsPage />
                 </TabsContent>
 
                 <TabsContent value="reviews" className="space-y-6">
@@ -234,18 +255,6 @@ const TurfOwnerDashboard = () => {
                     <h3 className="text-2xl font-semibold text-gray-800 mb-4">Reviews & Ratings</h3>
                     <p className="text-gray-600 text-lg">View and respond to customer reviews</p>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="analytics" className="space-y-6">
-                  <div className="text-center py-16">
-                    <BarChart3 className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Business Analytics</h3>
-                    <p className="text-gray-600 text-lg">Detailed insights and performance metrics</p>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="revenue" className="space-y-6">
-                  <PaymentsPage />
                 </TabsContent>
               </Tabs>
             </CardContent>
