@@ -13,6 +13,12 @@ import { ChatComponent } from '@/components/ui/chat-component';
 import { NotificationsComponent } from '@/components/ui/notifications';
 import { SettingsComponent } from '@/components/ui/settings';
 import { AdminOverview } from '@/components/ui/dashboard-pages/admin-overview';
+import { AdminBookings } from '@/components/ui/dashboard-pages/admin-bookings';
+import { AdminTurfs } from '@/components/ui/dashboard-pages/admin-turfs';
+import { AdminPlayers } from '@/components/ui/dashboard-pages/admin-players';
+import { AdminMatchmaking } from '@/components/ui/dashboard-pages/admin-matchmaking';
+import { AdminTournaments } from '@/components/ui/dashboard-pages/admin-tournaments';
+import { AnalyticsDashboard } from '@/components/ui/dashboard-pages/analytics-dashboard';
 import { PaymentsPage } from '@/components/ui/dashboard-pages/payments-page';
 
 const AdminDashboard = () => {
@@ -119,42 +125,62 @@ const AdminDashboard = () => {
           <Card className="backdrop-blur-2xl bg-white/30 border border-white/30 rounded-3xl shadow-2xl">
             <CardContent className="p-8">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-6 bg-white/40 backdrop-blur-sm rounded-2xl p-1 mb-8 shadow-lg border border-white/20">
+                <TabsList className="grid w-full grid-cols-6 lg:grid-cols-8 bg-white/40 backdrop-blur-sm rounded-2xl p-1 mb-8 shadow-lg border border-white/20">
                   <TabsTrigger 
                     value="overview" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
-                    Overview
+                    <Activity className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Overview</span>
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="approvals" 
+                    value="bookings" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
-                    Approvals
+                    <Shield className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Bookings</span>
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="users" 
+                    value="turfs" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
-                    Users & Turfs
+                    <MapPin className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Turfs</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="players" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
+                  >
+                    <Users className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Players</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="matchmaking" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
+                  >
+                    <Activity className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Matches</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="tournaments" 
+                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
+                  >
+                    <Trophy className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Tournaments</span>
                   </TabsTrigger>
                   <TabsTrigger 
                     value="analytics" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
-                    Analytics
+                    <TrendingUp className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Analytics</span>
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="reports" 
+                    value="payments" 
                     className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
                   >
-                    Reports
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="revenue" 
-                    className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:text-blue-700 transition-all duration-300"
-                  >
-                    Revenue
+                    <DollarSign className="w-4 h-4 lg:mr-2" />
+                    <span className="hidden lg:inline">Payments</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -162,39 +188,31 @@ const AdminDashboard = () => {
                   <AdminOverview />
                 </TabsContent>
 
-                <TabsContent value="approvals" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Shield className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Pending Approvals</h3>
-                    <p className="text-gray-600 text-lg">Review and approve platform submissions</p>
-                  </div>
+                <TabsContent value="bookings" className="space-y-6">
+                  <AdminBookings />
                 </TabsContent>
 
-                <TabsContent value="users" className="space-y-6">
-                  <div className="text-center py-16">
-                    <Users className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">User & Turf Management</h3>
-                    <p className="text-gray-600 text-lg">Manage users, turfs, and platform entities</p>
-                  </div>
+                <TabsContent value="turfs" className="space-y-6">
+                  <AdminTurfs />
+                </TabsContent>
+
+                <TabsContent value="players" className="space-y-6">
+                  <AdminPlayers />
+                </TabsContent>
+
+                <TabsContent value="matchmaking" className="space-y-6">
+                  <AdminMatchmaking />
+                </TabsContent>
+
+                <TabsContent value="tournaments" className="space-y-6">
+                  <AdminTournaments />
                 </TabsContent>
 
                 <TabsContent value="analytics" className="space-y-6">
-                  <div className="text-center py-16">
-                    <TrendingUp className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Platform Analytics</h3>
-                    <p className="text-gray-600 text-lg">Detailed insights and performance metrics</p>
-                  </div>
+                  <AnalyticsDashboard />
                 </TabsContent>
 
-                <TabsContent value="reports" className="space-y-6">
-                  <div className="text-center py-16">
-                    <AlertTriangle className="w-20 h-20 mx-auto mb-6 text-gray-400" />
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Reports & Issues</h3>
-                    <p className="text-gray-600 text-lg">Handle user reports and platform issues</p>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="revenue" className="space-y-6">
+                <TabsContent value="payments" className="space-y-6">
                   <PaymentsPage />
                 </TabsContent>
               </Tabs>
